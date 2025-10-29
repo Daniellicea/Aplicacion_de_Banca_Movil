@@ -76,7 +76,7 @@
                         </div>
                     </a>
 
-                    <a href="{{ route('qr-payments') }}" class="block w-full p-6 bg-card border-2 border-border hover:border-foreground transition-all rounded-lg group">
+                    <a href="{{ route('transactions.qr') }}" class="block w-full p-6 bg-card border-2 border-border hover:border-foreground transition-all rounded-lg group">
                         <div class="flex items-center justify-between">
                             <div>
                                 <h4 class="text-xl font-bold text-foreground mb-1">Pagos QR</h4>
