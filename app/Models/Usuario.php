@@ -8,7 +8,12 @@ class Usuario extends Model
 {
     protected $table = 'usuarios';
 
-    protected $fillable = ['correo', 'contraseña'];
+    // 👇 Permitir asignación masiva en estos campos
+    protected $fillable = [
+        'nombre', 'correo', 'contrasena',
+    ];
 
-    public $timestamps = false;
+    protected $hidden = [
+        'contrasena',
+    ];
 }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Usuario;
+use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
@@ -13,27 +14,29 @@ class AuthController extends Controller
 
     public function login(Request $request) {
         $request->validate([
-            'email' => 'required|email',
-            'password' => 'required',
+            'email'    => ['required','email'],
+            'password' => ['required','string'],
         ]);
 
         // Buscar usuario por correo
         $usuario = Usuario::where('correo', $request->email)->first();
 
-        if ($usuario && $usuario->contraseña === $request->password) {
-            // Guardar sesión
+        // Verificar contraseña hasheada en columna 'contrasena'
+        if ($usuario && Hash::check($request->password, $usuario->contrasena)) {
+            // Guardar sesión (si no usas guards de Auth)
             session(['usuario_id' => $usuario->id]);
-            return redirect('/dashboard'); // o tu ruta principal
+
+            return redirect()->route('dashboard'); // o ->to('/dashboard')
         }
 
-        return back()->withErrors([
-            'email' => 'Correo o contraseña incorrectos.',
-        ]);
+        return back()
+            ->withErrors(['email' => 'Correo o contraseña incorrectos.'])
+            ->withInput(['email' => $request->email]);
     }
 
     public function logout() {
         session()->flush();
-        return redirect('/login');
+        return redirect()->route('login.form'); // o ->to('/login')
     }
 
     public function showRegister() {
@@ -42,15 +45,18 @@ class AuthController extends Controller
 
     public function register(Request $request) {
         $request->validate([
-            'email' => 'required|email|unique:usuarios,correo',
-            'password' => 'required|min:4',
+            'name'                  => ['required','string','max:255'],
+            'email'                 => ['required','email','max:255','unique:usuarios,correo','confirmed'],
+            'password'              => ['required','string','min:8','confirmed'],
         ]);
 
         Usuario::create([
-            'correo' => $request->email,
-            'contraseña' => $request->password,
+            'nombre'     => $request->name,
+            'correo'     => $request->email,
+            'contrasena' => Hash::make($request->password),
         ]);
 
-        return redirect('/login')->with('success', 'Usuario registrado correctamente.');
+        return redirect()->route('login.form')
+            ->with('success', 'Usuario registrado correctamente.');
     }
 }
