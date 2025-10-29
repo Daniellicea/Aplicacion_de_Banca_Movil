@@ -71,7 +71,9 @@
             <div class="mt-8 text-center">
                 <p class="text-sm text-muted-foreground">
                     ¿No tienes cuenta?
-                    <a href="#" class="text-foreground font-semibold hover:underline">Regístrate aquí</a>
+                    <a href="{{ route('register.form') }}" class="text-foreground font-semibold hover:underline">
+                        Regístrate aquí
+                    </a>
                 </p>
             </div>
         </div>
