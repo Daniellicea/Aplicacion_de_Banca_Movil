@@ -3,12 +3,17 @@
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\home;
-use App\Http\Controllers\layouts;
-use App\Http\Controllers\support;
-use App\Http\Controllers\transactions;
-use App\Http\Controllers\user;
+use App\Http\Controllers\Home;
+use App\Http\Controllers\Layouts;
+use App\Http\Controllers\Support;
+use App\Http\Controllers\Transactions;
+use App\Http\Controllers\UserController; // ✅ ESTE ES EL CONTROLADOR CORRECTO
 
+/*
+|--------------------------------------------------------------------------
+| RUTA DE BIENVENIDA
+|--------------------------------------------------------------------------
+*/
 Route::get('/', function () {
     return view('welcome');
 })->name('welcome');
@@ -31,15 +36,14 @@ Route::middleware('guest')->group(function () {
 
 /*
 |--------------------------------------------------------------------------
-| RUTAS ACCESIBLES TRAS INICIAR SESIÓN (sin usar middleware 'auth')
+| RUTAS DESPUÉS DE INICIAR SESIÓN
 |--------------------------------------------------------------------------
-| Como usas tu propia sesión manual con 'usuario_id', estas rutas no deben
-| estar protegidas por el middleware 'auth' de Laravel.
+| Estas rutas se acceden luego del login, pero sin middleware auth (porque usas sesión manual).
 */
-Route::get('/dashboard', [home::class, 'home'])->name('dashboard');
-Route::get('/home', [home::class, 'home'])->name('home');
+Route::get('/dashboard', [Home::class, 'home'])->name('dashboard');
+Route::get('/home', [Home::class, 'home'])->name('home');
 
-// Cerrar sesión (puedes usar GET mientras estás en desarrollo)
+// Cerrar sesión
 Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 
 /*
@@ -49,24 +53,31 @@ Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 */
 
 // Layouts
-Route::get('/layouts/app', [layouts::class, 'app'])->name('app');
-Route::get('/layouts/cards', [layouts::class, 'card'])->name('layouts.cards');
+Route::get('/layouts/app', [Layouts::class, 'app'])->name('app');
+Route::get('/layouts/cards', [Layouts::class, 'card'])->name('layouts.cards');
 
 // Soporte
-Route::get('/support', [support::class, 'support'])->name('support');
+Route::get('/support', [Support::class, 'support'])->name('support');
 
 // Transacciones
-Route::get('/transactions/loans', [transactions::class, 'loans'])->name('transactions.loans');
-Route::get('/transactions/transfer', [transactions::class, 'transfer'])->name('transactions.transfer');
-Route::post('/transactions/transfer', [transactions::class, 'store'])->name('transactions.transfer.store');
+Route::get('/transactions/loans', [Transactions::class, 'loans'])->name('transactions.loans');
+Route::get('/transactions/transfer', [Transactions::class, 'transfer'])->name('transactions.transfer');
+Route::post('/transactions/transfer', [Transactions::class, 'store'])->name('transactions.transfer.store');
 
-// Pagos QR (rutas corregidas con los nombres correctos usados en el dashboard)
-Route::get('/transactions/qr-payments', [transactions::class, 'qr'])->name('transactions.qr');
-Route::post('/transactions/qr-payments', [transactions::class, 'generateQr'])->name('transactions.qr.generate');
+// Pagos QR
+Route::get('/transactions/qr-payments', [Transactions::class, 'qr'])->name('transactions.qr');
+Route::post('/transactions/qr-payments', [Transactions::class, 'generateQr'])->name('transactions.qr.generate');
 
-// Cuentas / Usuarios
-Route::get('/users/account', [user::class, 'account'])->name('users.account');
-Route::get('/accounts', [user::class, 'account'])->name('accounts');
+// Cuentas y perfil de usuario
+Route::get('/users/account', [UserController::class, 'account'])->name('users.account');
+Route::get('/accounts', [UserController::class, 'account'])->name('accounts');
 
-// Seguridad (página informativa pública)
+// Seguridad (pública)
 Route::get('/security', [AuthController::class, 'security'])->name('security');
+
+/*
+|--------------------------------------------------------------------------
+| CRUD DE USUARIOS
+|--------------------------------------------------------------------------
+*/
+Route::resource('usuarios', UserController::class)->names('usuarios');
