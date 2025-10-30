@@ -7,7 +7,6 @@
     <title>@yield('title', 'Bankario - Banca Móvil')</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Tus variables CSS y clases personalizadas */
         :root {
             --background: oklch(0.99 0 0);
             --foreground: oklch(0.15 0 0);
@@ -25,7 +24,6 @@
             --input: oklch(0.96 0 0);
             --ring: oklch(0.15 0 0);
         }
-
         body { background-color: var(--background); color: var(--foreground); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
         .bg-background { background-color: var(--background); }
         .bg-card { background-color: var(--card); }
@@ -47,34 +45,14 @@
 </head>
 <body class="bg-background min-h-screen flex flex-col">
 
-    <!-- Navbar -->
-    <header class="bg-card border-b border-border px-6 py-4 flex justify-between items-center">
-        <div class="text-2xl font-bold text-foreground">
-            <a href="{{ url('/') }}">Bankario</a>
-        </div>
+{{-- Sin navbar aquí para evitar duplicados. Si algún día quieres
+     un header opcional, puedes definir una sección "layout_header"
+     en la vista y descomentar la línea de abajo. --}}
+{{-- @yield('layout_header') --}}
 
-        <div class="flex items-center gap-4">
-            @auth
-                <span class="text-muted-foreground text-sm">
-                    Bienvenido, {{ session('usuario_nombre') ?? 'Usuario' }}
-                </span>
-
-                <a href="{{ route('logout') }}"
-                   class="block px-4 py-2 text-sm text-red-600 hover:text-red-800 font-semibold transition-colors">
-                   Cerrar sesión
-                </a>
-            @endauth
-
-            @guest
-                <a href="{{ route('login.form') }}" class="text-sm font-semibold hover:underline">Iniciar sesión</a>
-            @endguest
-        </div>
-    </header>
-
-    <!-- Contenido principal -->
-    <main class="flex-1">
-        @yield('content')
-    </main>
+<main class="flex-1">
+    @yield('content')
+</main>
 
 </body>
 </html>

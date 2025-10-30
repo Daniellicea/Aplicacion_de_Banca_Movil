@@ -7,7 +7,7 @@ use App\Http\Controllers\Home;
 use App\Http\Controllers\Layouts;
 use App\Http\Controllers\Support;
 use App\Http\Controllers\Transactions;
-use App\Http\Controllers\UserController; // ✅ ESTE ES EL CONTROLADOR CORRECTO
+use App\Http\Controllers\UserController; // ✅ Controlador correcto
 
 /*
 |--------------------------------------------------------------------------
@@ -22,7 +22,6 @@ Route::get('/', function () {
 |--------------------------------------------------------------------------
 | RUTAS DE AUTENTICACIÓN
 |--------------------------------------------------------------------------
-| Estas rutas permiten el acceso al login y registro sin necesidad de estar autenticado.
 */
 Route::middleware('guest')->group(function () {
     // Login
@@ -36,15 +35,14 @@ Route::middleware('guest')->group(function () {
 
 /*
 |--------------------------------------------------------------------------
-| RUTAS DESPUÉS DE INICIAR SESIÓN
+| RUTAS POST LOGIN
 |--------------------------------------------------------------------------
-| Estas rutas se acceden luego del login, pero sin middleware auth (porque usas sesión manual).
 */
 Route::get('/dashboard', [Home::class, 'home'])->name('dashboard');
 Route::get('/home', [Home::class, 'home'])->name('home');
 
 // Cerrar sesión
-Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 /*
 |--------------------------------------------------------------------------
@@ -62,17 +60,17 @@ Route::get('/support', [Support::class, 'support'])->name('support');
 // Transacciones
 Route::get('/transactions/loans', [Transactions::class, 'loans'])->name('transactions.loans');
 Route::get('/transactions/transfer', [Transactions::class, 'transfer'])->name('transactions.transfer');
-Route::post('/transactions/transfer', [Transactions::class, 'store'])->name('transactions.transfer.store');
+Route::post('/transactions/transfer', [Transactions::class, 'store'])->name('transfers.store'); // ✅ nombre correcto para tu Blade
 
 // Pagos QR
 Route::get('/transactions/qr-payments', [Transactions::class, 'qr'])->name('transactions.qr');
-Route::post('/transactions/qr-payments', [Transactions::class, 'generateQr'])->name('transactions.qr.generate');
+Route::post('/transactions/qr-payments', [Transactions::class, 'generateQr'])->name('qr-payments.generate'); // ✅ nombre correcto para tu Blade
 
-// Cuentas y perfil de usuario
+// Cuentas y perfil
 Route::get('/users/account', [UserController::class, 'account'])->name('users.account');
 Route::get('/accounts', [UserController::class, 'account'])->name('accounts');
 
-// Seguridad (pública)
+// Seguridad
 Route::get('/security', [AuthController::class, 'security'])->name('security');
 
 /*
