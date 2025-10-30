@@ -8,35 +8,51 @@
         <header class="border-b-2 border-border bg-card">
             <div class="max-w-7xl mx-auto px-6 py-6 flex items-center justify-between">
                 <h1 class="text-3xl font-bold text-foreground">Bankario</h1>
-                <form method="POST" action="{{ route('logout') }}">
-                    @csrf
-                    <button type="submit" class="text-sm uppercase tracking-wide text-muted-foreground hover:text-foreground transition-colors">
-                        Cerrar Sesión
-                    </button>
-                </form>
+
+                <div class="flex items-center gap-6">
+                    <!-- Botón Administrar Usuarios -->
+                    <a href="{{ route('usuarios.index') }}"
+                       class="flex items-center gap-2 text-sm uppercase tracking-wide text-muted-foreground hover:text-foreground transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16" class="w-4 h-4 text-blue-600">
+                            <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H3zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
+                        </svg>
+                        Administrar Usuarios
+                    </a>
+
+                    <!-- Botón Cerrar Sesión -->
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <button type="submit"
+                                class="text-sm uppercase tracking-wide text-muted-foreground hover:text-foreground transition-colors">
+                            Cerrar Sesión
+                        </button>
+                    </form>
+                </div>
             </div>
         </header>
 
         <main class="max-w-7xl mx-auto px-6 py-12">
             <!-- Saludo -->
             <div class="mb-12">
-                <h2 class="text-6xl font-bold text-foreground mb-4">Hola, {{ $user->name }}</h2>
+                <h2 class="text-6xl font-bold text-foreground mb-4">
+                    Hola, {{ session('usuario_nombre') ?? 'Usuario' }}
+                </h2>
                 <p class="text-xl text-muted-foreground">Bienvenido a tu banca móvil</p>
             </div>
 
             <!-- Tarjeta de saldo -->
             <div class="bg-gradient-to-br from-gray-900 to-gray-700 rounded-2xl p-12 text-white mb-16 shadow-xl">
                 <p class="text-sm uppercase tracking-wider opacity-80 mb-2">Saldo Total</p>
-                <p class="text-6xl font-bold mb-8">${{ number_format($totalBalance, 2) }}</p>
+                <p class="text-6xl font-bold mb-8">${{ number_format($totalBalance ?? 0, 2) }}</p>
 
                 <div class="flex gap-4">
                     <div class="flex-1">
                         <p class="text-xs uppercase tracking-wider opacity-60 mb-1">Ingresos</p>
-                        <p class="text-xl font-semibold">+${{ number_format($income, 2) }}</p>
+                        <p class="text-xl font-semibold">+${{ number_format($income ?? 0, 2) }}</p>
                     </div>
                     <div class="flex-1">
                         <p class="text-xs uppercase tracking-wider opacity-60 mb-1">Gastos</p>
-                        <p class="text-xl font-semibold">-${{ number_format($expenses, 2) }}</p>
+                        <p class="text-xl font-semibold">-${{ number_format($expenses ?? 0, 2) }}</p>
                     </div>
                 </div>
             </div>
@@ -61,9 +77,9 @@
                         </div>
                     </a>
 
-                    <!-- Las demás rutas están comentadas temporalmente -->
-
-                    <a href="{{ route('transactions.transfer') }}" class="block w-full p-6 bg-card border-2 border-border hover:border-foreground transition-all rounded-lg group">
+                    <!-- Transferencias -->
+                    <a href="{{ route('transactions.transfer') }}"
+                       class="block w-full p-6 bg-card border-2 border-border hover:border-foreground transition-all rounded-lg group">
                         <div class="flex items-center justify-between">
                             <div>
                                 <h4 class="text-xl font-bold text-foreground mb-1">Transferencias</h4>
@@ -76,7 +92,9 @@
                         </div>
                     </a>
 
-                    <a href="{{ route('transactions.qr') }}" class="block w-full p-6 bg-card border-2 border-border hover:border-foreground transition-all rounded-lg group">
+                    <!-- Pagos QR -->
+                    <a href="{{ route('transactions.qr') }}"
+                       class="block w-full p-6 bg-card border-2 border-border hover:border-foreground transition-all rounded-lg group">
                         <div class="flex items-center justify-between">
                             <div>
                                 <h4 class="text-xl font-bold text-foreground mb-1">Pagos QR</h4>
@@ -89,62 +107,11 @@
                         </div>
                     </a>
 
-
-                    {{--
-                    <a href="{{ route('cards') }}" class="block w-full p-6 bg-card border-2 border-border hover:border-foreground transition-all rounded-lg group">
+                    <!-- Administrar Usuarios -->
+                    <a href="{{ route('usuarios.index') }}"
+                       class="block w-full p-6 bg-card border-2 border-border hover:border-foreground transition-all rounded-lg group">
                         <div class="flex items-center justify-between">
                             <div>
-                                <h4 class="text-xl font-bold text-foreground mb-1">Gestión de Tarjetas</h4>
-                                <p class="text-sm text-muted-foreground">Administra tus tarjetas de débito y crédito</p>
+                                <h4 class="text-xl font-bold text-foreground mb-1">Administrar Usuarios</h4>
+                                <p class="text-sm text-muted-foreground">Ver, editar o eliminar usuarios del sistema</p>
                             </div>
-                            <svg class="w-6 h-6 text-muted-foreground group-hover:text-foreground transition-colors"
-                                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                            </svg>
-                        </div>
-                    </a>
-
-                    <a href="{{ route('loans') }}" class="block w-full p-6 bg-card border-2 border-border hover:border-foreground transition-all rounded-lg group">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <h4 class="text-xl font-bold text-foreground mb-1">Préstamos</h4>
-                                <p class="text-sm text-muted-foreground">Solicita y gestiona tus préstamos</p>
-                            </div>
-                            <svg class="w-6 h-6 text-muted-foreground group-hover:text-foreground transition-colors"
-                                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                            </svg>
-                        </div>
-                    </a>
-
-                    <a href="{{ route('security') }}" class="block w-full p-6 bg-card border-2 border-border hover:border-foreground transition-all rounded-lg group">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <h4 class="text-xl font-bold text-foreground mb-1">Seguridad (2FA)</h4>
-                                <p class="text-sm text-muted-foreground">Configura la autenticación de dos factores</p>
-                            </div>
-                            <svg class="w-6 h-6 text-muted-foreground group-hover:text-foreground transition-colors"
-                                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                            </svg>
-                        </div>
-                    </a>
-
-                    <a href="{{ route('support') }}" class="block w-full p-6 bg-card border-2 border-border hover:border-foreground transition-all rounded-lg group">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <h4 class="text-xl font-bold text-foreground mb-1">Soporte en Línea</h4>
-                                <p class="text-sm text-muted-foreground">Obtén ayuda y contacta con nosotros</p>
-                            </div>
-                            <svg class="w-6 h-6 text-muted-foreground group-hover:text-foreground transition-colors"
-                                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                            </svg>
-                        </div>
-                    </a>
-                    --}}
-                </div>
-            </div>
-        </main>
-    </div>
-@endsection
