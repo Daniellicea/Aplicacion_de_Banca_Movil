@@ -21,51 +21,50 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $request->validate([
-            'email'    => 'required|email',
+            'correo'   => 'required|email',
             'password' => 'required|string',
         ]);
 
-        $usuario = Usuario::where('correo', $request->email)->first();
+        $usuario = Usuario::where('correo', $request->correo)->first();
 
         if ($usuario && Hash::check($request->password, $usuario->contrasena)) {
 
-            // Seguridad: regenerar la sesión
             $request->session()->regenerate();
 
-            // Guardar en sesión
             session([
                 'usuario_id'     => $usuario->id,
                 'usuario_nombre' => $usuario->nombre,
+                'usuario_correo' => $usuario->correo,
             ]);
 
             return redirect()->route('dashboard');
         }
 
         return back()->withErrors([
-            'email' => 'Correo o contraseña incorrectos.'
-        ])->withInput(['email' => $request->email]);
+            'correo' => 'Correo o contraseña incorrectos.',
+        ])->withInput(['correo' => $request->correo]);
     }
 
     public function register(Request $request)
     {
         $request->validate([
             'nombre'   => 'required|string|max:255',
-            'email'    => 'required|email|unique:usuarios,correo',
-            'password' => 'required|min:6|confirmed'
+            'correo'   => 'required|email|unique:usuarios,correo',
+            'password' => 'required|min:8|confirmed',
         ]);
 
         $usuario = Usuario::create([
             'nombre'     => $request->nombre,
-            'correo'     => $request->email,
+            'correo'     => $request->correo,
             'contrasena' => Hash::make($request->password),
         ]);
 
-        // Seguridad: regenerar la sesión
         $request->session()->regenerate();
 
         session([
             'usuario_id'     => $usuario->id,
             'usuario_nombre' => $usuario->nombre,
+            'usuario_correo' => $usuario->correo,
         ]);
 
         return redirect()->route('dashboard');
@@ -73,12 +72,10 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
-        // Invalida y regenera token CSRF
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        // Limpia claves propias
-        session()->forget(['usuario_id', 'usuario_nombre']);
+        session()->forget(['usuario_id', 'usuario_nombre', 'usuario_correo']);
 
         return redirect()->route('login.form');
     }
