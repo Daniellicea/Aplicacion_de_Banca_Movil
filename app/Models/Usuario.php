@@ -2,18 +2,32 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
 
-class Usuario extends Model
+class Usuario extends Authenticatable
 {
+    use Notifiable;
+
     protected $table = 'usuarios';
+    protected $primaryKey = 'id';
+    public $timestamps = true;
 
-    // 👇 Permitir asignación masiva en estos campos
-    protected $fillable = [
-        'nombre', 'correo', 'contrasena',
-    ];
+    // ✅ Coincidir con columnas reales
+    protected $fillable = ['nombre', 'correo', 'contrasena'];
 
-    protected $hidden = [
-        'contrasena',
-    ];
+    // ✅ Ocultar contraseña real
+    protected $hidden = ['contrasena', 'remember_token'];
+
+    // ✅ Laravel usa este campo como contraseña
+    public function getAuthPassword()
+    {
+        return $this->contrasena;
+    }
+
+    // ✅ Por si usas recuperación
+    public function getEmailForPasswordReset()
+    {
+        return $this->correo;
+    }
 }

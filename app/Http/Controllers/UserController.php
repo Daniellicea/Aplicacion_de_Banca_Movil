@@ -2,156 +2,160 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Usuario;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
-    /**
-     * Muestra la lista de todos los usuarios (Read - R)
-     * GET /usuarios
-     */
-    public function index()
+    // ==========================
+    // PERFIL DEL USUARIO LOGUEADO
+    // ==========================
+    public function profile()
     {
-        $usuarios = Usuario::all();
+        $id = session('usuario_id');
+        $usuario = Usuario::findOrFail($id);
 
-        // ✅ ahora busca la vista en /resources/views/users/index.blade.php
-        return view('users.index', compact('usuarios'));
+        // Cargamos la vista unificada (perfil + formularios)
+        return view('users.index', compact('usuario'));
     }
 
-    /**
-     * Muestra el formulario para crear un nuevo usuario (Create - C)
-     * GET /usuarios/create
-     */
+    public function updateProfile(Request $request)
+    {
+        $id = session('usuario_id');
+        $usuario = Usuario::findOrFail($id);
+
+        $request->validate([
+            'nombre'   => 'required|string|max:255',
+            // El correo llega como hidden (porque el input visible está disabled)
+            'correo'   => "required|email|unique:usuarios,correo,{$usuario->id}",
+            'password' => 'nullable|min:8|confirmed',
+        ]);
+
+        $usuario->nombre = $request->nombre;
+
+        if ($request->filled('password')) {
+            $usuario->password = Hash::make($request->password);
+        }
+
+        $usuario->save();
+
+        return redirect()->route('users.profile')->with('success', 'Perfil actualizado correctamente.');
+    }
+
+    public function updatePassword(Request $request)
+    {
+        $id = session('usuario_id');
+        $usuario = Usuario::findOrFail($id);
+
+        $request->validate([
+            'current_password' => 'required',
+            'password'         => 'required|min:8|confirmed',
+        ]);
+
+        if (!Hash::check($request->current_password, $usuario->password)) {
+            return back()->withErrors(['current_password' => 'La contraseña actual es incorrecta']);
+        }
+
+        $usuario->password = Hash::make($request->password);
+        $usuario->save();
+
+        return redirect()->route('users.profile')->with('success', 'Contraseña actualizada correctamente.');
+    }
+
+    public function destroyAccount()
+    {
+        $id = session('usuario_id');
+        $usuario = Usuario::findOrFail($id);
+
+        session()->flush();
+        $usuario->delete();
+
+        return redirect()->route('welcome')->with('success', 'Tu cuenta ha sido eliminada.');
+    }
+
+    // Vista de cuentas (dashboard card)
+    public function account()
+    {
+        $id = session('usuario_id');
+        $usuario = Usuario::findOrFail($id);
+        return view('users.account', compact('usuario'));
+    }
+
+    // ==========================
+    // CRUD ADMIN DE USUARIOS
+    // ==========================
+    public function index()
+    {
+        // Para la vista unificada que muestra el perfil arriba
+        $id = session('usuario_id');
+        $usuario = Usuario::findOrFail($id);
+
+        // Lista para la tabla de administración (si la usas en esa misma vista)
+        $usuarios = Usuario::orderBy('id', 'desc')->paginate(10);
+
+        return view('users.index', compact('usuario', 'usuarios'));
+    }
+
     public function create()
     {
         return view('users.create');
     }
 
-    /**
-     * Guarda un nuevo usuario en la base de datos (Store - C)
-     * POST /usuarios
-     */
     public function store(Request $request)
     {
         $request->validate([
-            'nombre'    => 'required|string|max:255',
-            'correo'    => 'required|email|unique:usuarios,correo',
-            'password'  => 'required|min:8|confirmed',
+            'nombre'   => 'required|string|max:255',
+            'correo'   => 'required|email|unique:usuarios,correo',
+            'password' => 'required|min:8|confirmed',
         ]);
 
         Usuario::create([
-            'nombre'     => $request->nombre,
-            'correo'     => $request->correo,
-            'contrasena' => Hash::make($request->password),
+            'nombre'   => $request->nombre,
+            'correo'   => $request->correo,
+            'password' => Hash::make($request->password),
         ]);
 
-        return redirect()->route('usuarios.index')
-            ->with('success', '✅ Usuario creado exitosamente.');
+        return redirect()->route('usuarios.index')->with('success', 'Usuario creado correctamente.');
     }
 
-    /**
-     * Muestra un usuario específico (Show - R)
-     * GET /usuarios/{usuario}
-     */
-    public function show(Usuario $usuario)
+    public function edit($id)
     {
-        return view('users.show', compact('usuario'));
-    }
-
-    /**
-     * Muestra el formulario para editar un usuario (Edit - U)
-     * GET /usuarios/{usuario}/edit
-     */
-    public function edit(Usuario $usuario)
-    {
+        $usuario = Usuario::findOrFail($id);
         return view('users.edit', compact('usuario'));
     }
 
-    /**
-     * Actualiza un usuario en la base de datos (Update - U)
-     * PUT/PATCH /usuarios/{usuario}
-     */
-    public function update(Request $request, Usuario $usuario)
+    public function update(Request $request, $id)
     {
+        $usuario = Usuario::findOrFail($id);
+
         $request->validate([
             'nombre'   => 'required|string|max:255',
-            'correo'   => "required|email|unique:usuarios,correo,{$usuario->id}",
+            // Para admin: permitir correo editable, respetando unicidad
+            'correo'   => "nullable|email|unique:usuarios,correo,{$id}",
             'password' => 'nullable|min:8|confirmed',
         ]);
 
-        $data = [
-            'nombre' => $request->nombre,
-            'correo' => $request->correo,
-        ];
+        $usuario->nombre = $request->nombre;
 
-        if ($request->filled('password')) {
-            $data['contrasena'] = Hash::make($request->password);
+        if ($request->filled('correo')) {
+            $usuario->correo = $request->correo;
         }
 
-        $usuario->update($data);
+        if ($request->filled('password')) {
+            $usuario->password = Hash::make($request->password);
+        }
 
-        return redirect()->route('usuarios.index')
-            ->with('success', '✏️ Usuario actualizado exitosamente.');
+        $usuario->save();
+
+        return redirect()->route('usuarios.index')->with('success', 'Usuario actualizado correctamente.');
     }
 
-    /**
-     * Elimina un usuario (Delete - D)
-     * DELETE /usuarios/{usuario}
-     */
-    public function destroy(Usuario $usuario)
+    public function destroy($id)
     {
+        $usuario = Usuario::findOrFail($id);
         $usuario->delete();
 
-        return redirect()->route('usuarios.index')
-            ->with('success', '🗑️ Usuario eliminado exitosamente.');
-    }
-
-    /**
-     * Página de cuentas del usuario (ya la tenías en tu sistema)
-     */
-    public function account()
-    {
-        $accounts = [
-            [
-                'type' => 'Cuenta de Ahorro',
-                'name' => 'Ahorros Personales',
-                'number' => '**** 4582',
-                'balance' => 15230.75,
-            ],
-            [
-                'type' => 'Cuenta Corriente',
-                'name' => 'Cuenta Principal',
-                'number' => '**** 9923',
-                'balance' => 8740.00,
-            ],
-        ];
-
-        $transactions = [
-            [
-                'description' => 'Depósito en efectivo',
-                'date' => '2025-10-21',
-                'type' => 'credit',
-                'amount' => 2000.00,
-            ],
-            [
-                'description' => 'Pago de servicios',
-                'date' => '2025-10-20',
-                'type' => 'debit',
-                'amount' => -450.00,
-            ],
-            [
-                'description' => 'Transferencia recibida',
-                'date' => '2025-10-19',
-                'type' => 'credit',
-                'amount' => 1250.00,
-            ],
-        ];
-
-        return view('users.accounts', [
-            'accounts' => $accounts,
-            'transactions' => $transactions,
-        ]);
+        return redirect()->route('usuarios.index')->with('success', 'Usuario eliminado correctamente.');
     }
 }

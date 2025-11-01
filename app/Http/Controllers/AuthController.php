@@ -29,8 +29,14 @@ class AuthController extends Controller
 
         if ($usuario && Hash::check($request->password, $usuario->contrasena)) {
 
-            session(['usuario_id' => $usuario->id]);
-            session(['usuario_nombre' => $usuario->nombre]);
+            // Seguridad: regenerar la sesión
+            $request->session()->regenerate();
+
+            // Guardar en sesión
+            session([
+                'usuario_id'     => $usuario->id,
+                'usuario_nombre' => $usuario->nombre,
+            ]);
 
             return redirect()->route('dashboard');
         }
@@ -43,33 +49,42 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         $request->validate([
-            'nombre' => 'required|string|max:255',
-            'email'  => 'required|email|unique:usuarios,correo',
+            'nombre'   => 'required|string|max:255',
+            'email'    => 'required|email|unique:usuarios,correo',
             'password' => 'required|min:6|confirmed'
         ]);
 
         $usuario = Usuario::create([
-            'nombre' => $request->nombre,
-            'correo' => $request->email,
+            'nombre'     => $request->nombre,
+            'correo'     => $request->email,
             'contrasena' => Hash::make($request->password),
         ]);
 
-        session(['usuario_id' => $usuario->id]);
-        session(['usuario_nombre' => $usuario->nombre]);
+        // Seguridad: regenerar la sesión
+        $request->session()->regenerate();
+
+        session([
+            'usuario_id'     => $usuario->id,
+            'usuario_nombre' => $usuario->nombre,
+        ]);
 
         return redirect()->route('dashboard');
     }
 
-    public function logout()
+    public function logout(Request $request)
     {
+        // Invalida y regenera token CSRF
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        // Limpia claves propias
         session()->forget(['usuario_id', 'usuario_nombre']);
-        session()->flush();
 
         return redirect()->route('login.form');
     }
 
     public function security()
     {
-        return view('auth.security'); // crea esta vista si no existe
+        return view('auth.security');
     }
 }
