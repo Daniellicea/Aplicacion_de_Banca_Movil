@@ -12,7 +12,7 @@ Route::get('/', function () {
     return view('welcome');
 })->name('welcome');
 
-// ✅ Invitados
+//  Invitados
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login.form');
     Route::post('/login', [AuthController::class, 'login'])->name('login');
@@ -21,7 +21,7 @@ Route::middleware('guest')->group(function () {
     Route::post('/register', [AuthController::class, 'register'])->name('register');
 });
 
-// ✅ Rutas protegidas
+// Rutas protegidas
 Route::middleware('auth.session')->group(function () {
 
     // Dashboard
@@ -46,18 +46,18 @@ Route::middleware('auth.session')->group(function () {
     Route::get('/transactions/qr-payments', [Transactions::class, 'qr'])->name('transactions.qr');
     Route::post('/transactions/qr-payments', [Transactions::class, 'generateQr'])->name('qr-payments.generate');
 
-    // ✅ PERFIL DEL USUARIO (tal como pediste)
+    //  PERFIL DEL USUARIO
     Route::get('/mi-perfil', [UserController::class, 'profile'])->name('users.profile');
     Route::put('/mi-perfil', [UserController::class, 'updateProfile'])->name('users.update_profile');
     Route::put('/mi-perfil/password', [UserController::class, 'updatePassword'])->name('users.update_password');
     Route::delete('/mi-perfil', [UserController::class, 'destroyAccount'])->name('users.destroy_account');
 
-    // ✅ Página cuenta (del dashboard card)
+    //  Página cuenta (del dashboard card)
     Route::get('/users/account', [UserController::class, 'account'])->name('users.account');
 
-    // ✅ Administración de usuarios
+    //  Administración de usuarios
     Route::resource('usuarios', UserController::class)->names('usuarios');
 });
 
-// ✅ Página pública de seguridad
+//  Página pública de seguridad
 Route::get('/security', [AuthController::class, 'security'])->name('security');

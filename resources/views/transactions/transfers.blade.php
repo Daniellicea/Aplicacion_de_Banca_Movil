@@ -27,8 +27,16 @@
                 </div>
             @endif
 
+            @if($errors->any())
+                <div class="mb-8 p-6 bg-red-50 border-2 border-red-200 rounded-lg">
+                    @foreach($errors->all() as $error)
+                        <p class="text-red-800 font-semibold">{{ $error }}</p>
+                    @endforeach
+                </div>
+            @endif
+
             <!-- Formulario de transferencia -->
-            <form method="POST" action="{{ route('transfers.store') }}" class="space-y-8 mb-16">
+            <form method="POST" action="{{ route('transfers.store') }}" class="space-y-8 mb-16" onsubmit="return validateForm()">
                 @csrf
 
                 <div class="space-y-3">
@@ -54,10 +62,12 @@
                         name="amount"
                         type="number"
                         step="0.01"
+                        min="0.01"
                         placeholder="0.00"
                         class="w-full h-14 px-4 text-base bg-background border-2 border-border focus:border-foreground transition-colors rounded-lg outline-none"
                         required
                     />
+                    <p class="text-sm text-muted-foreground mt-1">El monto debe ser mayor a 0</p>
                 </div>
 
                 <div class="space-y-3">
@@ -75,7 +85,7 @@
 
                 <button
                     type="submit"
-                    class="w-full h-14 text-base font-semibold bg-primary hover:bg-primary/90 text-primary-foreground transition-all rounded-lg"
+                    class="w-full h-14 text-base font-semibold bg-sky-500 hover:bg-sky-600 text-white transition-all rounded-lg shadow-md hover:shadow-lg"
                 >
                     Realizar Transferencia
                 </button>
@@ -105,5 +115,40 @@
         function fillAccount(account) {
             document.getElementById('account').value = account;
         }
+
+        function validateForm() {
+            const amountInput = document.getElementById('amount');
+            const amount = parseFloat(amountInput.value);
+
+            if (amount <= 0) {
+                alert('El monto debe ser un número positivo mayor a 0');
+                amountInput.focus();
+                return false;
+            }
+
+            return true;
+        }
+
+        // Validación en tiempo real
+        document.getElementById('amount').addEventListener('input', function() {
+            const amount = parseFloat(this.value);
+            if (amount <= 0 && this.value !== '') {
+                this.classList.add('border-red-500');
+            } else {
+                this.classList.remove('border-red-500');
+            }
+        });
     </script>
+
+    <style>
+        .bg-sky-500 {
+            background-color: #0ea5e9;
+        }
+        .hover\:bg-sky-600:hover {
+            background-color: #0284c7;
+        }
+        .border-red-500 {
+            border-color: #ef4444;
+        }
+    </style>
 @endsection
