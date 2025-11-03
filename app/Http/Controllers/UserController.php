@@ -21,47 +21,52 @@ class UserController extends Controller
     }
 
     public function updateProfile(Request $request)
-    {
-        $id = session('usuario_id');
-        $usuario = Usuario::findOrFail($id);
+{
+    $id = session('usuario_id');
+    $usuario = Usuario::findOrFail($id);
 
-        $request->validate([
-            'nombre'   => 'required|string|max:255',
-            // El correo llega como hidden (porque el input visible está disabled)
-            'correo'   => "required|email|unique:usuarios,correo,{$usuario->id}",
-            'password' => 'nullable|min:8|confirmed',
-        ]);
+    $request->validate([
+        'nombre'   => 'required|string|max:255',
+        // El correo llega como hidden (porque el input visible está disabled)
+        'correo'   => "required|email|unique:usuarios,correo,{$usuario->id}",
+        'password' => 'nullable|min:8|confirmed',
+    ]);
 
-        $usuario->nombre = $request->nombre;
+    $usuario->nombre = $request->nombre;
 
-        if ($request->filled('password')) {
-            $usuario->password = Hash::make($request->password);
-        }
-
-        $usuario->save();
-
-        return redirect()->route('users.profile')->with('success', 'Perfil actualizado correctamente.');
+    if ($request->filled('password')) {
+        $usuario->password = Hash::make($request->password);
     }
+
+    $usuario->save();
+
+    // 🔹 Actualizar el nombre en la sesión (para reflejarlo sin volver a iniciar sesión)
+    session(['usuario_nombre' => $usuario->nombre]);
+
+    return redirect()->route('users.profile')->with('success', 'Perfil actualizado correctamente.');
+}
 
     public function updatePassword(Request $request)
-    {
-        $id = session('usuario_id');
-        $usuario = Usuario::findOrFail($id);
+{
+    $id = session('usuario_id');
+    $usuario = Usuario::findOrFail($id);
 
-        $request->validate([
-            'current_password' => 'required',
-            'password'         => 'required|min:8|confirmed',
-        ]);
+    $request->validate([
+        'current_password' => 'required',
+        'password'         => 'required|min:8|confirmed',
+    ]);
 
-        if (!Hash::check($request->current_password, $usuario->password)) {
-            return back()->withErrors(['current_password' => 'La contraseña actual es incorrecta']);
-        }
-
-        $usuario->password = Hash::make($request->password);
-        $usuario->save();
-
-        return redirect()->route('users.profile')->with('success', 'Contraseña actualizada correctamente.');
+    // Revisar la contraseña actual usando el campo correcto
+    if (!Hash::check($request->current_password, $usuario->contrasena)) {
+        return back()->withErrors(['current_password' => 'La contraseña actual es incorrecta']);
     }
+
+    // Actualizar la contraseña en el campo correcto
+    $usuario->contrasena = Hash::make($request->password);
+    $usuario->save();
+
+    return redirect()->route('users.profile')->with('success', 'Contraseña actualizada correctamente.');
+}
 
     public function destroyAccount()
     {
@@ -71,7 +76,7 @@ class UserController extends Controller
         session()->flush();
         $usuario->delete();
 
-        return redirect()->route('welcome')->with('success', 'Tu cuenta ha sido eliminada.');
+        return redirect()->route('login.form')->with('success', 'Tu cuenta ha sido eliminada.');
     }
 
     // Vista de cuentas (dashboard card)

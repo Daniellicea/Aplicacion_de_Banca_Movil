@@ -9,8 +9,8 @@ use App\Http\Controllers\Transactions;
 use App\Http\Controllers\UserController;
 
 Route::get('/', function () {
-    return view('welcome');
-})->name('welcome');
+    return redirect()->route('login.form');
+});
 
 //  Invitados
 Route::middleware('guest')->group(function () {
@@ -46,18 +46,18 @@ Route::middleware('auth.session')->group(function () {
     Route::get('/transactions/qr-payments', [Transactions::class, 'qr'])->name('transactions.qr');
     Route::post('/transactions/qr-payments', [Transactions::class, 'generateQr'])->name('qr-payments.generate');
 
-    //  PERFIL DEL USUARIO
+    // PERFIL DEL USUARIO
     Route::get('/mi-perfil', [UserController::class, 'profile'])->name('users.profile');
     Route::put('/mi-perfil', [UserController::class, 'updateProfile'])->name('users.update_profile');
     Route::put('/mi-perfil/password', [UserController::class, 'updatePassword'])->name('users.update_password');
     Route::delete('/mi-perfil', [UserController::class, 'destroyAccount'])->name('users.destroy_account');
 
-    //  Página cuenta (del dashboard card)
+    // Página cuenta (del dashboard card)
     Route::get('/users/account', [UserController::class, 'account'])->name('users.account');
 
-    //  Administración de usuarios
+    // Administración de usuarios (manteniendo el plural)
     Route::resource('usuarios', UserController::class)->names('usuarios');
 });
 
-//  Página pública de seguridad
+// Página pública de seguridad
 Route::get('/security', [AuthController::class, 'security'])->name('security');
