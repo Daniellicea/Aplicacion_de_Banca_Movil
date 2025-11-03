@@ -94,7 +94,7 @@ public function account()
             'type' => 'Cuenta Corriente',
             'name' => 'Gastos diarios',
             'number' => '9876 5432 1098',
-            'balance' => 2980.00,
+            'balance' => 272.50,
         ],
     ];
 
@@ -122,6 +122,8 @@ public function account()
         ],
     ];
 
+    $total_gastos = -545.50;
+
     // ==========================
     // Retornar vista con datos
     // ==========================
@@ -131,7 +133,6 @@ public function account()
         'transactions' => $transactions,
     ]);
 }
-
 
     // ==========================
     // CRUD ADMIN DE USUARIOS

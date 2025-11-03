@@ -22,18 +22,46 @@
             <!-- Título -->
             <h2 class="text-5xl font-bold text-foreground mb-12">Mis Cuentas</h2>
 
+            <!-- Resumen financiero -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-8 mb-16">
+                <div class="bg-card border-2 border-border rounded-lg p-8 text-center">
+                    <p class="text-sm uppercase tracking-wide text-muted-foreground mb-2">
+                        Ingresos (último periodo)
+                    </p>
+                    <p class="text-3xl font-bold text-green-600">
+                        +${{ number_format($totalIngresos ?? 8500.00) }}
+                    </p>
+                </div>
+                <div class="bg-card border-2 border-border rounded-lg p-8 text-center">
+                    <p class="text-sm uppercase tracking-wide text-muted-foreground mb-2">
+                        Gastos (último periodo)
+                    </p>
+                    <p class="text-3xl font-bold text-red-600">
+                        -${{ number_format($totalGastos ?? 545.50, 2) }}
+                    </p>
+                </div>
+            </div>
+
             <!-- Lista de cuentas -->
             <div class="space-y-4 mb-16">
                 @foreach($accounts as $account)
                     <div class="bg-card border-2 border-border rounded-lg p-8">
                         <div class="flex items-center justify-between">
                             <div>
-                                <p class="text-sm uppercase tracking-wide text-muted-foreground mb-1">{{ $account['type'] }}</p>
-                                <h3 class="text-2xl font-bold text-foreground">{{ $account['name'] }}</h3>
-                                <p class="text-sm text-muted-foreground mt-1">{{ $account['number'] }}</p>
+                                <p class="text-sm uppercase tracking-wide text-muted-foreground mb-1">
+                                    {{ $account['type'] }}
+                                </p>
+                                <h3 class="text-2xl font-bold text-foreground">
+                                    {{ $account['name'] }}
+                                </h3>
+                                <p class="text-sm text-muted-foreground mt-1">
+                                    {{ $account['number'] }}
+                                </p>
                             </div>
                             <div class="text-right">
-                                <p class="text-3xl font-bold text-foreground">${{ number_format($account['balance'], 2) }}</p>
+                                <p class="text-3xl font-bold text-foreground">
+                                    ${{ number_format($account['balance'], 2) }}
+                                </p>
                                 <p class="text-sm text-muted-foreground mt-1">MXN</p>
                             </div>
                         </div>
@@ -50,11 +78,15 @@
                         <div class="p-6 border-b-2 border-border last:border-b-0 hover:bg-secondary transition-colors">
                             <div class="flex items-center justify-between">
                                 <div>
-                                    <p class="text-base font-semibold text-foreground">{{ $transaction['description'] }}</p>
-                                    <p class="text-sm text-muted-foreground mt-1">{{ $transaction['date'] }}</p>
+                                    <p class="text-base font-semibold text-foreground">
+                                        {{ $transaction['description'] }}
+                                    </p>
+                                    <p class="text-sm text-muted-foreground mt-1">
+                                        {{ $transaction['date'] }}
+                                    </p>
                                 </div>
-                                <p class="text-xl font-bold {{ $transaction['type'] === 'credit' ? 'text-green-600' : 'text-foreground' }}">
-                                    {{ $transaction['type'] === 'credit' ? '+' : '' }}${{ number_format(abs($transaction['amount']), 2) }}
+                                <p class="text-xl font-bold {{ $transaction['type'] === 'credit' ? 'text-green-600' : 'text-red-600' }}">
+                                    {{ $transaction['type'] === 'credit' ? '+' : '-' }}${{ number_format(abs($transaction['amount']), 2) }}
                                 </p>
                             </div>
                         </div>
