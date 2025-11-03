@@ -16,9 +16,18 @@
             {{-- Tarjeta principal --}}
             <div class="bg-white border border-gray-200 rounded-xl p-10 shadow-2xl shadow-blue-100/50">
 
+                {{-- Mensaje de éxito (al registrarse) --}}
+                @if (session('success'))
+                    <div class="mb-6 p-4 bg-green-50 border border-green-300 rounded-lg shadow-sm">
+                        <p class="text-green-700 text-sm font-semibold">
+                            {{ session('success') }}
+                        </p>
+                    </div>
+                @endif
+
                 {{-- Mensaje de error --}}
-                @if($errors->any())
-                    <div class="mb-6 p-4 bg-red-50 border border-red-300 rounded-lg">
+                @if ($errors->any())
+                    <div class="mb-6 p-4 bg-red-50 border border-red-300 rounded-lg shadow-sm">
                         <p class="text-red-700 text-sm font-semibold">{{ $errors->first() }}</p>
                     </div>
                 @endif

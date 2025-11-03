@@ -66,7 +66,7 @@ class AuthController extends Controller
             'usuario_correo' => $usuario->correo,
         ]);
 
-        return redirect()->route('dashboard');
+        return redirect()->route('login')->with('success', 'Registro exitoso. Inicia sesión para continuar.');
     }
 
     public function logout(Request $request)
