@@ -25,15 +25,15 @@
 
                     {{-- Campo Correo Electrónico --}}
                     <div>
-                        <label for="email" class="block text-xs font-semibold text-gray-700 uppercase tracking-widest mb-2">
+                        <label for="correo" class="block text-xs font-semibold text-gray-700 uppercase tracking-widest mb-2">
                             Correo Electrónico
                         </label>
                         <input
-                            id="email"
-                            name="email"
+                            id="correo"
+                            name="correo"
                             type="email"
                             placeholder="tu@email.com"
-                            value="{{ old('email') }}"
+                            value="{{ old('correo') }}"
                             {{-- Estilos de input claros y enfocados --}}
                             class="w-full h-12 px-4 text-base bg-white border border-gray-300 text-gray-900 rounded-lg outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition duration-200"
                             required

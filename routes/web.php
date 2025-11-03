@@ -61,3 +61,8 @@ Route::middleware('auth.session')->group(function () {
 
 //  Página pública de seguridad
 Route::get('/security', [AuthController::class, 'security'])->name('security');
+
+
+Route::middleware('auth.session')->group(function() {
+    Route::resource('movimientos', MovimientoController::class);
+});
