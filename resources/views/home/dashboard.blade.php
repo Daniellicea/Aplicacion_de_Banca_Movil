@@ -93,11 +93,11 @@
                 <div class="flex gap-12 border-t border-white/50 pt-6">
                     <div class="flex-1">
                         <p class="text-xs uppercase tracking-wider opacity-70 mb-1">Ingresos (último periodo)</p>
-                        <p class="text-2xl font-semibold text-green-200">+${{ number_format($income ?? 0, 2) }}</p>
+                        <p class="text-2xl font-semibold text-green-200">+${{ number_format($income ?? 8500.00) }}</p>
                     </div>
                     <div class="flex-1">
                         <p class="text-xs uppercase tracking-wider opacity-70 mb-1">Gastos (último periodo)</p>
-                        <p class="text-2xl font-semibold text-red-300">-${{ number_format($expenses ?? 0, 2) }}</p>
+                        <p class="text-2xl font-semibold text-red-300">-${{ number_format($expenses ?? 545.50, 2) }}</p>
                     </div>
                 </div>
             </div>
