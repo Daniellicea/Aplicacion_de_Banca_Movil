@@ -19,31 +19,30 @@ class AuthController extends Controller
     }
 
     public function login(Request $request)
-    {
-        $request->validate([
-            'correo'   => 'required|email',
-            'password' => 'required|string',
+{
+    $request->validate([
+        'email'   => 'required|email',
+        'password' => 'required|string',
+    ]);
+
+    $usuario = Usuario::where('correo', $request->email)->first();
+
+    if ($usuario && Hash::check($request->password, $usuario->contrasena)) {
+        $request->session()->regenerate();
+
+        session([
+            'usuario_id'     => $usuario->id,
+            'usuario_nombre' => $usuario->nombre,
+            'usuario_correo' => $usuario->correo,
         ]);
 
-        $usuario = Usuario::where('correo', $request->correo)->first();
-
-        if ($usuario && Hash::check($request->password, $usuario->contrasena)) {
-
-            $request->session()->regenerate();
-
-            session([
-                'usuario_id'     => $usuario->id,
-                'usuario_nombre' => $usuario->nombre,
-                'usuario_correo' => $usuario->correo,
-            ]);
-
-            return redirect()->route('dashboard');
-        }
-
-        return back()->withErrors([
-            'correo' => 'Correo o contraseña incorrectos.',
-        ])->withInput(['correo' => $request->correo]);
+        return redirect()->route('dashboard');
     }
+
+    return back()->withErrors([
+        'email' => 'Correo o contraseña incorrectos.',
+    ])->withInput(['email' => $request->email]);
+}
 
     public function register(Request $request)
     {
