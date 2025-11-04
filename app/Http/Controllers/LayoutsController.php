@@ -4,15 +4,15 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
-class layouts extends Controller
+class layoutsController extends Controller
 {
     public function app()
     {
-        return view('layouts.app');
+        return view('layoutsController.app');
     }
 
     public function card()
     {
-        return view('layouts.cards');
+        return view('layoutsController.cards');
     }
 }
