@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Home;
-use App\Http\Controllers\Layouts;
+use App\Http\Controllers\layoutsController;
 use App\Http\Controllers\Support;
 use App\Http\Controllers\Transactions;
 use App\Http\Controllers\UserController;
@@ -32,8 +32,8 @@ Route::middleware('auth.session')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
     // Layouts
-    Route::get('/layouts/app', [Layouts::class, 'app'])->name('app');
-    Route::get('/layouts/cards', [Layouts::class, 'card'])->name('layouts.cards');
+    Route::get('/layoutsController/app', [layoutsController::class, 'app'])->name('app');
+    Route::get('/layoutsController/cards', [layoutsController::class, 'card'])->name('layoutsController.cards');
 
     // Soporte
     Route::get('/support', [Support::class, 'support'])->name('support');
@@ -61,3 +61,10 @@ Route::middleware('auth.session')->group(function () {
 
 // Página pública de seguridad
 Route::get('/security', [AuthController::class, 'security'])->name('security');
+
+
+Route::post('/security/2fa', [AuthController::class, 'enableTwoFactor'])
+    ->name('security.2fa');
+
+Route::post('/support', [support::class, 'store'])
+    ->name('support.store');

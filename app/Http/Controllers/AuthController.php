@@ -19,30 +19,30 @@ class AuthController extends Controller
     }
 
     public function login(Request $request)
-{
-    $request->validate([
-        'email'   => 'required|email',
-        'password' => 'required|string',
-    ]);
-
-    $usuario = Usuario::where('correo', $request->email)->first();
-
-    if ($usuario && Hash::check($request->password, $usuario->contrasena)) {
-        $request->session()->regenerate();
-
-        session([
-            'usuario_id'     => $usuario->id,
-            'usuario_nombre' => $usuario->nombre,
-            'usuario_correo' => $usuario->correo,
+    {
+        $request->validate([
+            'email'   => 'required|email',
+            'password' => 'required|string',
         ]);
 
-        return redirect()->route('dashboard');
-    }
+        $usuario = Usuario::where('correo', $request->email)->first();
 
-    return back()->withErrors([
-        'email' => 'Correo o contraseña incorrectos.',
-    ])->withInput(['email' => $request->email]);
-}
+        if ($usuario && Hash::check($request->password, $usuario->contrasena)) {
+            $request->session()->regenerate();
+
+            session([
+                'usuario_id'     => $usuario->id,
+                'usuario_nombre' => $usuario->nombre,
+                'usuario_correo' => $usuario->correo,
+            ]);
+
+            return redirect()->route('dashboard');
+        }
+
+        return back()->withErrors([
+            'email' => 'Correo o contraseña incorrectos.',
+        ])->withInput(['email' => $request->email]);
+    }
 
     public function register(Request $request)
     {
@@ -81,6 +81,12 @@ class AuthController extends Controller
 
     public function security()
     {
-        return view('auth.security');
+        $id = session('usuario_id');
+        $usuario = $id ? Usuario::find($id) : null;
+
+        // Si el usuario tiene teléfono guardado → Asumimos 2FA activo
+        $twoFactorEnabled = $usuario && $usuario->phone ? true : false;
+
+        return view('auth.security', compact('usuario', 'twoFactorEnabled'));
     }
 }
