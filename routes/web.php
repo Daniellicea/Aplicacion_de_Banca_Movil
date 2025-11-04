@@ -2,10 +2,10 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\Home;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Layouts;
 use App\Http\Controllers\Support;
-use App\Http\Controllers\Transactions;
+use App\Http\Controllers\TransactionsController;
 use App\Http\Controllers\UserController;
 
 Route::get('/', function () {
@@ -25,8 +25,8 @@ Route::middleware('guest')->group(function () {
 Route::middleware('auth.session')->group(function () {
 
     // Dashboard
-    Route::get('/dashboard', [Home::class, 'home'])->name('dashboard');
-    Route::get('/home', [Home::class, 'home'])->name('home');
+    Route::get('/dashboard', [HomeController::class, 'home'])->name('dashboard');
+    Route::get('/home', [HomeController::class, 'home'])->name('home');
 
     // Logout
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
@@ -39,12 +39,12 @@ Route::middleware('auth.session')->group(function () {
     Route::get('/support', [Support::class, 'support'])->name('support');
 
     // Transacciones
-    Route::get('/transactions/loans', [Transactions::class, 'loans'])->name('transactions.loans');
-    Route::get('/transactions/transfer', [Transactions::class, 'transfer'])->name('transactions.transfer');
-    Route::post('/transactions/transfer', [Transactions::class, 'store'])->name('transfers.store');
+    Route::get('/transactions/loans', [TransactionsController::class, 'loans'])->name('transactions.loans');
+    Route::get('/transactions/transfer', [TransactionsController::class, 'transfer'])->name('transactions.transfer');
+    Route::post('/transactions/transfer', [TransactionsController::class, 'store'])->name('transfers.store');
 
-    Route::get('/transactions/qr-payments', [Transactions::class, 'qr'])->name('transactions.qr');
-    Route::post('/transactions/qr-payments', [Transactions::class, 'generateQr'])->name('qr-payments.generate');
+    Route::get('/transactions/qr-payments', [TransactionsController::class, 'qr'])->name('transactions.qr');
+    Route::post('/transactions/qr-payments', [TransactionsController::class, 'generateQr'])->name('qr-payments.generate');
 
     // PERFIL DEL USUARIO
     Route::get('/mi-perfil', [UserController::class, 'profile'])->name('users.profile');
