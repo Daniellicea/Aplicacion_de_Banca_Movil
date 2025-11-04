@@ -8,15 +8,11 @@ use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
-    // ==========================
     // PERFIL DEL USUARIO LOGUEADO
-    // ==========================
     public function profile()
     {
         $id = session('usuario_id');
         $usuario = Usuario::findOrFail($id);
-
-        // Cargamos la vista unificada (perfil + formularios)
         return view('users.index', compact('usuario'));
     }
 
@@ -27,7 +23,6 @@ class UserController extends Controller
 
         $request->validate([
             'nombre'   => 'required|string|max:255',
-            // El correo llega como hidden (porque el input visible está disabled)
             'correo'   => "required|email|unique:usuarios,correo,{$usuario->id}",
             'password' => 'nullable|min:8|confirmed',
         ]);
@@ -74,24 +69,41 @@ class UserController extends Controller
         return redirect()->route('welcome')->with('success', 'Tu cuenta ha sido eliminada.');
     }
 
-    // Vista de cuentas (dashboard card)
+    // ✅ Vista de cuentas CON SALDO Y MOVIMIENTOS
     public function account()
     {
         $id = session('usuario_id');
         $usuario = Usuario::findOrFail($id);
-        return view('users.account', compact('usuario'));
+
+        // Obtener saldo total del usuario
+        $balance = \App\Models\Movimiento::where('usuario_id', $id)
+            ->selectRaw("SUM(CASE WHEN tipo = 'abono' THEN monto ELSE -monto END) as balance")
+            ->value('balance') ?? 0;
+
+        // Definir cuenta del usuario (puedes ampliar después)
+        $accounts = [
+            [
+                'type' => 'Cuenta de Débito',
+                'name' => $usuario->nombre,
+                'number' => '****' . str_pad($usuario->id, 4, '0', STR_PAD_LEFT),
+                'balance' => $balance
+            ]
+        ];
+
+        // Obtener movimientos reales
+        $transactions = \App\Models\Movimiento::where('usuario_id', $id)
+            ->orderBy('fecha', 'desc')
+            ->get();
+
+        return view('users.accounts', compact('usuario', 'accounts', 'transactions'));
     }
 
-    // ==========================
     // CRUD ADMIN DE USUARIOS
-    // ==========================
     public function index()
     {
-        // Para la vista unificada que muestra el perfil arriba
         $id = session('usuario_id');
         $usuario = Usuario::findOrFail($id);
 
-        // Lista para la tabla de administración (si la usas en esa misma vista)
         $usuarios = Usuario::orderBy('id', 'desc')->paginate(10);
 
         return view('users.index', compact('usuario', 'usuarios'));
@@ -131,7 +143,6 @@ class UserController extends Controller
 
         $request->validate([
             'nombre'   => 'required|string|max:255',
-            // Para admin: permitir correo editable, respetando unicidad
             'correo'   => "nullable|email|unique:usuarios,correo,{$id}",
             'password' => 'nullable|min:8|confirmed',
         ]);
