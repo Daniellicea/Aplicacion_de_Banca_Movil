@@ -21,7 +21,7 @@ class TransactionsController extends Controller
         // Inicializar saldo y movimientos si no existen en sesión
         if (!session()->has('saldo_real')) {
             session([
-                'saldo_real' => 5000.00, // saldo inicial
+                'saldo_real' => 5000.00, // Saldo inicial
                 'transactions' => [
                     [
                         'description' => 'Depósito Nómina',
