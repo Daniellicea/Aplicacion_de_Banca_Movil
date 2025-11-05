@@ -1,70 +1,113 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+
+// Controladores
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\Home;
-use App\Http\Controllers\layoutsController;
-use App\Http\Controllers\Support;
-use App\Http\Controllers\Transactions;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\LayoutsController;
+use App\Http\Controllers\SupportController;
+use App\Http\Controllers\TransactionsController;
 use App\Http\Controllers\UserController;
 
-Route::get('/', function () {
-    return redirect()->route('login.form');
-});
 
-//  Invitados
+/*
+|--------------------------------------------------------------------------
+| Rutas de Invitado (Sin Login)
+|--------------------------------------------------------------------------
+*/
 Route::middleware('guest')->group(function () {
+
+    Route::redirect('/', '/login');
+
+    // Login
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login.form');
     Route::post('/login', [AuthController::class, 'login'])->name('login');
 
+    // Registro
     Route::get('/register', [AuthController::class, 'showRegister'])->name('register.form');
     Route::post('/register', [AuthController::class, 'register'])->name('register');
 });
 
-// Rutas protegidas
+
+/*
+|--------------------------------------------------------------------------
+| Rutas Protegidas (Con Login)
+|--------------------------------------------------------------------------
+*/
 Route::middleware('auth.session')->group(function () {
 
-    // Dashboard
-    Route::get('/dashboard', [Home::class, 'home'])->name('dashboard');
-    Route::get('/home', [Home::class, 'home'])->name('home');
+    /*
+    | Dashboard
+    */
+    Route::get('/dashboard', [HomeController::class, 'home'])->name('dashboard');
+    Route::get('/home', [HomeController::class, 'home'])->name('home');
 
-    // Logout
+
+    /*
+    | Logout
+    */
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-    // Layouts
-    Route::get('/layoutsController/app', [layoutsController::class, 'app'])->name('app');
-    Route::get('/layoutsController/cards', [layoutsController::class, 'card'])->name('layoutsController.cards');
 
-    // Soporte
-    Route::get('/support', [Support::class, 'support'])->name('support');
+    /*
+    | Seguridad / 2FA
+    */
+    Route::get('/security', [AuthController::class, 'security'])->name('security');
 
-    // Transacciones
-    Route::get('/transactions/loans', [Transactions::class, 'loans'])->name('transactions.loans');
-    Route::get('/transactions/transfer', [Transactions::class, 'transfer'])->name('transactions.transfer');
-    Route::post('/transactions/transfer', [Transactions::class, 'store'])->name('transfers.store');
+    // Activar 2FA
+    Route::post('/security/2fa/enable', [AuthController::class, 'enableTwoFactor'])->name('security.2fa.enable');
 
-    Route::get('/transactions/qr-payments', [Transactions::class, 'qr'])->name('transactions.qr');
-    Route::post('/transactions/qr-payments', [Transactions::class, 'generateQr'])->name('qr-payments.generate');
+    // Verificar código en configuración
+    Route::post('/security/2fa/verify', [AuthController::class, 'verifyTwoFactor'])->name('security.2fa.verify');
 
-    // PERFIL DEL USUARIO
+    // Vista después del login para ingresar código 2FA
+    Route::get('/2fa/verify', [AuthController::class, 'showTwoFactorPrompt'])->name('2fa.prompt');
+
+    // Acción de desactivar 2FA
+    Route::post('/security/2fa/disable', [AuthController::class, 'disableTwoFactor'])->name('security.2fa.disable');
+
+
+    /*
+    | Layouts demo
+    */
+    Route::get('/layouts/app', [LayoutsController::class, 'app'])->name('layouts.app');
+    Route::get('/layouts/cards', [LayoutsController::class, 'cards'])->name('layouts.cards');
+
+
+    /*
+    | Soporte
+    */
+    Route::get('/support', [SupportController::class, 'support'])->name('support');
+    Route::post('/support', [SupportController::class, 'store'])->name('support.store');
+
+
+    /*
+    | Transacciones
+    */
+    Route::prefix('transactions')->group(function () {
+        Route::get('/loans', [TransactionsController::class, 'loans'])->name('transactions.loans');
+        Route::get('/transfer', [TransactionsController::class, 'transfer'])->name('transactions.transfer');
+        Route::post('/transfer', [TransactionsController::class, 'store'])->name('transfers.store');
+
+        Route::get('/qr-payments', [TransactionsController::class, 'qr'])->name('transactions.qr');
+        Route::post('/qr-payments', [TransactionsController::class, 'generateQr'])->name('qr-payments.generate');
+    });
+
+
+    /*
+    | Perfil y Cuenta Usuario
+    */
     Route::get('/mi-perfil', [UserController::class, 'profile'])->name('users.profile');
     Route::put('/mi-perfil', [UserController::class, 'updateProfile'])->name('users.update_profile');
     Route::put('/mi-perfil/password', [UserController::class, 'updatePassword'])->name('users.update_password');
     Route::delete('/mi-perfil', [UserController::class, 'destroyAccount'])->name('users.destroy_account');
 
-    // Página cuenta (del dashboard card)
     Route::get('/users/account', [UserController::class, 'account'])->name('users.account');
 
-    // Administración de usuarios (manteniendo el plural)
+
+    /*
+    | CRUD admin de usuarios
+    */
     Route::resource('usuarios', UserController::class)->names('usuarios');
 });
-
-// Página pública de seguridad
-Route::get('/security', [AuthController::class, 'security'])->name('security');
-
-
-Route::post('/security/2fa', [AuthController::class, 'enableTwoFactor'])
-    ->name('security.2fa');
-
-Route::post('/support', [support::class, 'store'])
-    ->name('support.store');
