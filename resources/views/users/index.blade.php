@@ -39,11 +39,8 @@
             <div class="bg-white shadow-xl rounded-xl p-8 border border-gray-200 mb-10">
                 <h3 class="text-2xl font-bold text-gray-800 border-b pb-3 mb-5">Detalles del Usuario</h3>
 
+                {{-- Se ha eliminado la visualización del ID --}}
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <p class="text-sm font-medium text-gray-500">ID</p>
-                        <p class="text-lg font-semibold text-gray-900">{{ $usuario->id }}</p>
-                    </div>
                     <div>
                         <p class="text-sm font-medium text-gray-500">Correo</p>
                         <p class="text-lg font-semibold text-gray-900">{{ $usuario->correo }}</p>

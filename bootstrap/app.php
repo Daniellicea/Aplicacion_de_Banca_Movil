@@ -11,8 +11,11 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+
+        // ✅ Alias de middleware
         $middleware->alias([
             'auth.session' => \App\Http\Middleware\AuthSession::class,
+            '2fa' => \App\Http\Middleware\Verify2FA::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

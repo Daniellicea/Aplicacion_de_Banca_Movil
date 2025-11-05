@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Usuario;
 
-class Home extends Controller
+class HomeController extends Controller
 {
     public function home()
     {

@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
-class layoutsController extends Controller
+class LayoutsController extends Controller
 {
     public function app()
     {
