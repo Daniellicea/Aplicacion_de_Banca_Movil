@@ -111,3 +111,18 @@ Route::middleware('auth.session')->group(function () {
     */
     Route::resource('usuarios', UserController::class)->names('usuarios');
 });
+
+
+
+
+/*---------------------------------------------------------------------------------------
+Nuevas rutas(no modificar)*/
+
+
+// Recuperación de contraseña
+Route::get('/forgot-password', [AuthController::class, 'showForgotPassword'])->name('password.request');
+Route::post('/forgot-password', [AuthController::class, 'sendResetLink'])->name('password.email');
+
+// Restablecer contraseña
+Route::get('/reset-password/{token}', [AuthController::class, 'showResetForm'])->name('password.reset');
+Route::post('/reset-password', [AuthController::class, 'resetPassword'])->name('password.update');
