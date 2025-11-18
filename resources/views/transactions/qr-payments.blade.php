@@ -2,64 +2,117 @@
 
 @section('title', 'Pagos QR - Bankario')
 
+{{-- Ajuste de CSS para usar solo clases y colores fijos --}}
+@section('head_extra')
+    <style>
+        /* Estilo para el contenedor del scanner cuando está activo */
+        .scanner-active {
+            border-color: #2563eb !important; /* blue-600 */
+            background-color: #ffffff !important; /* white */
+        }
+        /* Estilo para el contorno de enfoque del QR */
+        #scannerContainer::after {
+            content: '';
+            position: absolute;
+            top: 20%;
+            left: 20%;
+            width: 60%;
+            height: 60%;
+            border: 2px solid transparent;
+            box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.4);
+            pointer-events: none;
+            transition: box-shadow 0.5s;
+        }
+        .scanner-active #scannerContainer::after {
+            box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.6);
+        }
+
+        /* Animación de entrada */
+        @keyframes fadeInSlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .animate-fade-in-up {
+            opacity: 0;
+            animation: fadeInSlideUp 0.6s ease-out forwards;
+        }
+    </style>
+@endsection
+
 @section('content')
-    <div class="min-h-screen bg-gray-50 text-gray-900 font-sans">
-        <!-- Header (Estilo BANKARIO) -->
-        <header class="border-b border-gray-200 bg-white shadow-sm">
-            <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-                <a href="{{ route('dashboard') }}" class="flex items-center gap-2 text-gray-500 hover:text-blue-600 transition-colors">
+    <div class="min-h-screen bg-gray-50 antialiased">
+
+        {{-- Header Sólido --}}
+        <header class="border-b border-gray-200 bg-white sticky top-0 z-30 shadow-sm">
+            <div class="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
+                <a href="{{ route('dashboard') }}"
+                   class="flex items-center gap-3 text-gray-500 hover:text-blue-600 transition-colors p-2 rounded-full hover:bg-gray-100">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
                     </svg>
-                    <span class="text-sm font-medium hidden sm:inline">Volver</span>
+                    <span class="text-sm uppercase tracking-wider font-bold hidden sm:inline">Volver</span>
                 </a>
-                <h1 class="text-xl font-bold text-gray-900">Pagos QR</h1>
+                <h1 class="text-xl font-extrabold text-gray-900">Pagos QR</h1>
                 <div class="w-12"></div>
             </div>
         </header>
 
-        <main class="max-w-5xl mx-auto px-6 py-16">
+        <main class="max-w-5xl mx-auto px-6 py-12 md:py-16 animate-fade-in-up">
             <h2 class="text-4xl md:text-5xl font-extrabold text-gray-900 mb-12">
                 Pagos <span class="text-blue-600">con QR</span>
             </h2>
 
             <div class="grid lg:grid-cols-2 gap-8 md:gap-12">
 
-                <!-- 1. Escanear QR (Card) -->
-                <div class="bg-white border border-gray-200 rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-shadow duration-300">
-                    <h3 class="text-3xl font-bold text-gray-900 mb-6">Escanear QR</h3>
-                    <p class="text-gray-500 mb-6">Activa la cámara para escanear y procesar un pago.</p>
+                {{-- Tarjeta: Escanear QR --}}
+                <div class="bg-white border border-gray-200 rounded-3xl p-8 md:p-10 shadow-3xl shadow-blue-200/50 hover:shadow-blue-300/60 transition-shadow duration-300">
+                    <h3 class="text-3xl font-extrabold text-gray-900 mb-6 flex items-center gap-3">
+                        <svg class="w-7 h-7 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10a2 2 0 002 2h12a2 2 0 002-2V7M4 7h16M4 7l2-2h12l2 2M12 18v-6"/></svg>
+                        Escanear QR
+                    </h3>
+                    <p class="text-gray-500 mb-6 text-lg">Activa la cámara para escanear y procesar un pago de forma instantánea.</p>
 
-                    <!-- Contenedor de la Cámara / Placeholder -->
-                    <div id="scannerContainer" class="aspect-square bg-gray-100 rounded-xl flex items-center justify-center mb-6 overflow-hidden relative border-4 border-dashed border-gray-300">
-
+                    <div id="scannerContainer" class="aspect-square bg-gray-100 rounded-2xl flex items-center justify-center mb-6 overflow-hidden relative border-4 border-dashed border-gray-300 transition-colors duration-300">
                         <div id="scannerPlaceholder">
-                            <!-- Icono Scanner estilo BANKARIO -->
-                            <svg class="w-20 h-20 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            {{-- Icono Scanner estilo BANKARIO --}}
+                            <svg class="w-20 h-20 text-blue-600 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
                             </svg>
+                            <p class="text-sm text-gray-500 mt-3">Presiona "Abrir Cámara"</p>
                         </div>
-
                         <video id="qrVideo" class="absolute inset-0 w-full h-full object-cover hidden" playsinline></video>
                     </div>
 
-                    <!-- Botones de Acción de Cámara -->
-                    <button id="scanBtn" class="w-full h-14 text-lg font-bold bg-blue-600 hover:bg-blue-700 text-white transition-all rounded-xl shadow-lg shadow-blue-300/50 transform hover:scale-[1.01] duration-300">
+                    <button id="scanBtn"
+                            class="w-full h-14 text-lg font-extrabold bg-gradient-to-r from-blue-600 to-blue-700
+                                   hover:from-blue-700 hover:to-blue-800 text-white transition duration-300 rounded-xl
+                                   shadow-xl shadow-blue-500/40 transform hover:scale-[1.01]">
                         Abrir Cámara
                     </button>
-                    <button id="stopScanBtn" class="hidden w-full h-14 text-lg font-bold bg-red-500 hover:bg-red-600 text-white transition-all rounded-xl mt-3 shadow-lg shadow-red-300/50">
+                    <button id="stopScanBtn"
+                            class="hidden w-full h-14 text-lg font-extrabold bg-red-600 hover:bg-red-700 text-white transition-all rounded-xl mt-3 shadow-lg shadow-red-300/50 transform hover:scale-[1.01]">
                         Detener Cámara
                     </button>
                 </div>
 
-                <!-- 2. Generar QR (Card) -->
-                <div class="bg-white border border-gray-200 rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-shadow duration-300">
-                    <h3 class="text-3xl font-bold text-gray-900 mb-8">Generar QR</h3>
+                {{-- Tarjeta: Generar QR --}}
+                <div class="bg-white border border-gray-200 rounded-3xl p-8 md:p-10 shadow-3xl shadow-green-200/50 hover:shadow-green-300/60 transition-shadow duration-300">
+                    <h3 class="text-3xl font-extrabold text-gray-900 mb-8 flex items-center gap-3">
+                        <svg class="w-7 h-7 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                        Generar QR
+                    </h3>
 
                     <form id="qrForm" class="space-y-6">
+                        {{-- Monto --}}
                         <div class="space-y-2">
-                            <label for="amount" class="block text-sm font-semibold text-gray-700 uppercase tracking-wider">
-                                Monto
+                            <label for="amount" class="block text-xs font-bold text-gray-700 uppercase tracking-widest">
+                                Monto ($)
                             </label>
                             <input
                                 id="amount"
@@ -67,13 +120,15 @@
                                 type="number"
                                 step="0.01"
                                 placeholder="0.00"
-                                class="w-full h-14 px-5 text-xl font-mono bg-gray-50 border border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors rounded-xl outline-none"
+                                class="w-full h-14 px-5 text-xl font-mono bg-gray-50 border border-gray-300 rounded-xl shadow-inner-sm
+                                       focus:border-blue-600 focus:ring-2 focus:ring-blue-200 transition duration-300 outline-none"
                                 required
                             />
                         </div>
 
+                        {{-- Descripción --}}
                         <div class="space-y-2">
-                            <label for="description" class="block text-sm font-semibold text-gray-700 uppercase tracking-wider">
+                            <label for="description" class="block text-xs font-bold text-gray-700 uppercase tracking-widest">
                                 Descripción
                             </label>
                             <input
@@ -81,31 +136,31 @@
                                 name="description"
                                 type="text"
                                 placeholder="Concepto del pago"
-                                class="w-full h-14 px-5 text-base bg-gray-50 border border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors rounded-xl outline-none"
+                                class="w-full h-14 px-5 text-base bg-gray-50 border border-gray-300 rounded-xl shadow-inner-sm
+                                       focus:border-blue-600 focus:ring-2 focus:ring-blue-200 transition duration-300 outline-none"
                             />
                         </div>
 
                         <button
                             type="submit"
-                            class="w-full h-14 text-lg font-bold bg-green-500 hover:bg-green-600 text-white transition-all rounded-xl shadow-lg shadow-green-300/50 transform hover:scale-[1.01] duration-300"
+                            class="w-full h-14 text-lg font-extrabold bg-green-600 hover:bg-green-700 text-white transition-all rounded-xl shadow-xl shadow-green-400/50 transform hover:scale-[1.01] duration-300"
                         >
                             Generar Código QR
                         </button>
                     </form>
 
-                    <!-- Contenedor del QR Generado -->
-                    <div id="qrCodeContainer" class="hidden mt-10 pt-6 border-t border-gray-200 text-center">
-                        <h4 class="text-xl font-bold text-gray-800 mb-4">Código Generado</h4>
-                        <div class="bg-white p-4 border-2 border-green-400 rounded-xl max-w-[200px] mx-auto shadow-xl shadow-green-100/70">
-                            <img id="qrCodeImage" src="" alt="Código QR" class="w-full rounded-lg" />
+                    <div id="qrCodeContainer" class="hidden mt-10 pt-8 border-t border-gray-200 text-center">
+                        <h4 class="text-xl font-extrabold text-gray-900 mb-4">Código Generado y Listo</h4>
+                        <div class="bg-white p-4 border-2 border-green-500 rounded-xl max-w-[200px] mx-auto shadow-2xl shadow-green-200/70">
+                            <img id="qrCodeImage" src="" alt="Código QR de Pago" class="w-full rounded-lg" />
                         </div>
 
                         <div class="mt-4 text-center">
-                            <p id="qrAmount" class="font-bold text-2xl text-gray-900 mb-1"></p>
+                            <p id="qrAmount" class="font-extrabold text-3xl text-blue-600 mb-1"></p>
                             <p id="qrDescription" class="text-base text-gray-500"></p>
                         </div>
 
-                        <button id="downloadQrBtn" class="inline-flex items-center gap-2 px-6 py-3 mt-6 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors font-bold shadow-md shadow-blue-200/50">
+                        <button id="downloadQrBtn" class="inline-flex items-center gap-2 px-8 py-3 mt-6 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors font-extrabold shadow-md shadow-blue-300/50 transform hover:scale-[1.01]">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                             </svg>
@@ -117,11 +172,8 @@
         </main>
     </div>
 
+    {{-- Script de Lógica (Mantenido sin cambios) --}}
     <script>
-        // ************************************************************
-        // AVISO: El siguiente código JavaScript se mantiene sin cambios
-        // ************************************************************
-
         const qrForm = document.getElementById('qrForm');
         const qrCodeContainer = document.getElementById('qrCodeContainer');
         const qrCodeImage = document.getElementById('qrCodeImage');
@@ -169,8 +221,7 @@
                 document.body.removeChild(a);
             } catch (error) {
                 console.error('Error al descargar QR:', error);
-                // Usando un modal/alert en consola en lugar de alert()
-                console.error('Error al descargar el código QR');
+                console.error('Alerta de Descarga: Error al descargar el código QR');
             }
         });
 
@@ -178,6 +229,7 @@
         const stopScanBtn = document.getElementById('stopScanBtn');
         const video = document.getElementById('qrVideo');
         const scannerPlaceholder = document.getElementById('scannerPlaceholder');
+        const scannerContainer = document.getElementById('scannerContainer');
 
         let stream = null;
 
@@ -197,6 +249,7 @@
 
                 scannerPlaceholder.classList.add('hidden');
                 video.classList.remove('hidden');
+                scannerContainer.classList.add('scanner-active');
 
                 scanBtn.classList.add('hidden');
                 stopScanBtn.classList.remove('hidden');
@@ -214,7 +267,6 @@
                     errorMessage = 'La cámara está siendo utilizada por otra aplicación.';
                 }
 
-                // Usando un modal/alert en consola en lugar de alert()
                 console.error("Alerta de Cámara:", errorMessage);
             }
         });
@@ -228,6 +280,7 @@
             video.srcObject = null;
             video.classList.add('hidden');
             scannerPlaceholder.classList.remove('hidden');
+            scannerContainer.classList.remove('scanner-active');
 
             scanBtn.classList.remove('hidden');
             stopScanBtn.classList.add('hidden');

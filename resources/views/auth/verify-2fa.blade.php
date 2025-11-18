@@ -5,98 +5,115 @@
 @section('content')
     <div class="min-h-screen bg-gray-50 text-gray-900 font-sans">
 
-        {{-- Header --}}
-        <header class="border-b border-gray-200 bg-white shadow-sm">
+        {{-- Header Mejorado: Back Button Estilizado --}}
+        <header class="border-b border-gray-200 bg-white/90 backdrop-blur-sm shadow-sm sticky top-0 z-40 transition-all duration-300">
             <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-                <a href="{{ route('dashboard') }}" class="flex items-center gap-2 text-gray-500 hover:text-blue-600 transition-colors">
+                <a href="{{ route('dashboard') }}"
+                   class="flex items-center gap-2 text-gray-700 hover:text-blue-600 transition-colors
+                          p-2 rounded-full hover:bg-gray-100 font-bold text-sm">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
                     </svg>
-                    <span class="text-sm font-medium">Volver</span>
+                    Volver al Dashboard
                 </a>
-                <h1 class="text-xl font-bold text-gray-900">Seguridad</h1>
+                <h1 class="text-xl font-extrabold text-gray-900">Configuración de Seguridad</h1>
                 <div class="w-6"></div>
             </div>
         </header>
 
-        <main class="max-w-5xl mx-auto px-6 py-16">
+        <main class="max-w-5xl mx-auto px-6 py-12 md:py-16 animate-fade-in-up" style="animation-delay: 0.1s;">
 
-            {{-- Title --}}
-            <h2 class="text-4xl md:text-5xl font-extrabold text-gray-900 mb-12">
+            <h2 class="text-4xl md:text-5xl font-extrabold text-gray-900 mb-10 text-center md:text-left">
                 Seguridad de tu <span class="text-blue-600">Cuenta</span>
             </h2>
 
-            {{-- Mensajes --}}
+            {{-- Mensajes (Estilo Premium) --}}
             @if(session('success'))
-                <div class="mb-6 p-4 bg-green-50 border border-green-300 text-green-800 rounded-xl font-medium shadow-sm">
-                    ✅ {{ session('success') }}
+                <div class="mb-8 p-4 bg-green-50 border border-green-400 text-green-700 rounded-xl font-semibold shadow-md flex items-center gap-3">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    {{ session('success') }}
                 </div>
             @endif
 
             @if(session('error'))
-                <div class="mb-6 p-4 bg-red-50 border border-red-300 text-red-800 rounded-xl font-medium shadow-sm">
-                    ⚠️ {{ session('error') }}
+                <div class="mb-8 p-4 bg-red-50 border border-red-400 text-red-700 rounded-xl font-semibold shadow-md flex items-center gap-3">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    {{ session('error') }}
                 </div>
             @endif
 
-            {{-- CARD PRINCIPAL: Autenticación de Dos Factores --}}
-            <div class="bg-white border border-gray-200 rounded-2xl shadow-xl p-8 md:p-10">
+            {{-- CARD PRINCIPAL (Sombra Elevada) --}}
+            <div class="bg-white border border-gray-100 rounded-3xl shadow-3xl shadow-blue-100/50 p-8 md:p-12 transition-shadow duration-300 hover:shadow-blue-200/60">
 
                 @if(!$twoFactorEnabled)
 
-                    <h3 class="text-3xl font-bold text-gray-900 mb-4">Activar Autenticación de Dos Factores (2FA)</h3>
-                    <p class="text-gray-500 mb-10">
-                        Añade una capa extra de protección a tu cuenta. Escanea el código QR con una aplicación como Google Authenticator o Authy.
+                    <h3 class="text-3xl font-extrabold text-gray-900 mb-4">Activar Autenticación de Dos Factores (2FA)</h3>
+                    <p class="text-gray-500 mb-10 text-lg max-w-2xl">
+                        Añade una capa extra de protección. Escanea el código QR con una aplicación como Google Authenticator o Authy.
                     </p>
 
                     {{-- Contenido de Activación (QR y Formulario) --}}
-                    <div class="flex flex-col md:flex-row gap-10 items-start">
+                    <div class="flex flex-col lg:flex-row gap-10 md:gap-16 items-start">
 
-                        {{-- QR y clave --}}
-                        <div class="flex flex-col items-center p-4 bg-gray-50 rounded-xl border border-gray-200 shadow-inner w-full md:w-auto flex-shrink-0">
-                            <img src="{{ $qrCode }}" class="w-40 h-40 mb-4 rounded-lg shadow-lg" alt="Código QR para 2FA" />
-                            <p class="text-sm text-gray-700 font-mono bg-white p-2 rounded-lg border border-gray-300 select-all">
+                        {{-- QR y clave (Mejorado) --}}
+                        <div class="flex flex-col items-center p-8 bg-gray-50 rounded-3xl border border-gray-200 shadow-inner w-full lg:max-w-xs flex-shrink-0 transition-transform duration-300 hover:scale-[1.02]">
+                            <p class="text-sm font-bold text-gray-700 mb-4 uppercase tracking-wider">Paso 1: Escanear Código</p>
+
+                            <img src="{{ $qrCode }}" class="w-48 h-48 mb-6 rounded-xl shadow-2xl border-4 border-white" alt="Código QR para 2FA" />
+
+                            <p class="text-sm font-semibold text-gray-700 mb-2">Clave manual:</p>
+                            <p class="text-base text-gray-700 font-mono bg-white p-3 rounded-xl border-2 border-dashed border-blue-300 select-all w-full text-center tracking-widest break-all shadow-md cursor-pointer transition-colors hover:bg-blue-50">
                                 {{ $secret }}
                             </p>
-                            <p class="text-xs text-gray-400 mt-2 text-center">Clave manual si no puedes escanear.</p>
                         </div>
 
-                        {{-- Formulario de Verificación --}}
-                        <div class="flex-1 space-y-6 w-full">
+                        {{-- Formulario de Verificación (Estilo Premium) --}}
+                        <div class="flex-1 space-y-7 w-full">
+                            <h4 class="text-2xl font-bold text-gray-800 mb-4 border-b pb-2">Paso 2: Verificar Datos</h4>
+
                             <form method="POST" action="{{ route('security.2fa.enable') }}" class="space-y-6">
                                 @csrf
 
                                 {{-- Teléfono --}}
-                                <div class="space-y-2">
-                                    <label for="phone" class="block text-sm font-semibold text-gray-700">Número Telefónico</label>
+                                <div>
+                                    <label for="phone" class="block text-xs font-bold text-gray-700 uppercase tracking-widest mb-2">Número Telefónico</label>
                                     <input
                                         id="phone"
                                         type="tel"
                                         name="phone"
                                         required
-                                        class="w-full h-12 px-4 rounded-xl border border-gray-300 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-gray-50"
+                                        class="w-full h-12 px-4 text-base bg-gray-50 border border-gray-300 text-gray-900 rounded-xl
+                                               outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-200 transition duration-300 shadow-inner"
                                         placeholder="+52 123 456 7890"
+                                        value="{{ old('phone') }}"
                                     />
                                     @error('phone') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                                 </div>
 
                                 {{-- Código 2FA --}}
-                                <div class="space-y-2">
-                                    <label for="code" class="block text-sm font-semibold text-gray-700">Código 2FA (6 dígitos)</label>
+                                <div>
+                                    <label for="code" class="block text-xs font-bold text-gray-700 uppercase tracking-widest mb-2">Código 2FA (6 dígitos)</label>
                                     <input
                                         id="code"
                                         type="text"
+                                        inputmode="numeric"
+                                        pattern="\d{6}"
                                         maxlength="6"
                                         name="code"
                                         required
-                                        class="w-full h-12 px-4 rounded-xl border border-gray-300 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-gray-50 text-center tracking-widest text-xl font-bold"
+                                        class="w-full h-14 text-center text-2xl font-bold tracking-[.4em] rounded-xl border border-gray-300 bg-gray-50
+                                               focus:ring-2 focus:ring-blue-200 focus:border-blue-600 shadow-inner transition duration-300"
                                         placeholder="••••••"
                                     />
                                     @error('code') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                                 </div>
 
-                                {{-- Botón Activar --}}
-                                <button class="w-full h-14 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-lg shadow-blue-300/50 transform hover:scale-[1.01] transition duration-300">
+                                {{-- Botón Activar (Estilo Degradado) --}}
+                                <button type="submit"
+                                        class="w-full h-14 text-lg font-extrabold bg-gradient-to-r from-blue-600 to-blue-700
+                                               hover:from-blue-700 hover:to-blue-800 text-white transition duration-300 rounded-xl
+                                               shadow-xl shadow-blue-500/40 mt-8
+                                               transform hover:scale-[1.01] focus:outline-none focus:ring-4 focus:ring-blue-300">
                                     Activar 2FA y Guardar Teléfono
                                 </button>
                             </form>
@@ -106,20 +123,23 @@
 
                 @else
 
-                    {{-- Ya activado --}}
-                    <div class="text-center py-6 space-y-5">
-                        <div class="flex justify-center mb-4">
-                            <!-- Icono de escudo grande y verde -->
-                            <svg class="w-16 h-16 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.617-4.21a2 2 0 011.666 2.453l-1.04 4.159a4 4 0 01-3.2 2.802l-4.113 1.372a4 4 0 01-4.887-.905L4.555 13.91a2 2 0 01-.223-2.61L8.383 6.79a2 2 0 012.453-1.666l4.159 1.04a4 4 0 012.802 3.2l1.372 4.113a4 4 0 01-.905 4.887L17.09 19.445a2 2 0 01-2.61.223L8.79 16.383a2 2 0 01-1.666-2.453L8.163 9.77a4 4 0 013.2-2.802l4.113-1.372a4 4 0 014.887.905z"/>
-                            </svg>
-                        </div>
-                        <h4 class="text-4xl font-extrabold text-gray-900">2FA Activo</h4>
-                        <p class="text-lg text-gray-500">Tu cuenta está altamente protegida. Ahora se solicitará un código adicional en cada inicio de sesión.</p>
+                    {{-- Ya activado (Estilo Premium) --}}
+                    <div class="text-center py-8 md:py-12 space-y-6">
+                        <svg class="w-16 h-16 text-green-600 mx-auto transform animate-pulse-slow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4" />
+                            <circle cx="12" cy="12" r="9" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+                        </svg>
+
+                        <h4 class="text-4xl font-extrabold text-gray-900">2FA Activado y Protegido ✅</h4>
+                        <p class="text-lg text-gray-500 max-w-lg mx-auto">Tu cuenta cuenta con el nivel más alto de seguridad. Se solicitará el código de tu aplicación en cada inicio de sesión.</p>
 
                         <form method="POST" action="{{ route('security.2fa.disable') }}">
                             @csrf
-                            <button class="mt-6 px-6 py-2 border border-red-400 bg-red-50 text-red-600 hover:bg-red-100 hover:border-red-500 font-semibold rounded-xl transition duration-300 shadow-sm">
+                            {{-- Botón de Desactivar (Estilo de Riesgo/Advertencia) --}}
+                            <button type="submit"
+                                    class="mt-10 px-10 py-3 border-2 border-red-500 bg-white text-red-600 hover:bg-red-50
+                                           rounded-xl transition font-extrabold shadow-lg hover:shadow-xl
+                                           transform hover:-translate-y-0.5 focus:outline-none focus:ring-4 focus:ring-red-300">
                                 Desactivar Autenticación de Dos Factores
                             </button>
                         </form>
@@ -129,4 +149,31 @@
             </div>
         </main>
     </div>
+
+    {{-- CSS para Animación de Entrada --}}
+    <style>
+        @keyframes fadeInSlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .animate-fade-in-up {
+            opacity: 0;
+            animation: fadeInSlideUp 0.6s ease-out forwards;
+        }
+
+        /* Animación para el checkmark activado */
+        @keyframes pulse-slow {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.05); }
+        }
+        .animate-pulse-slow {
+            animation: pulse-slow 3s infinite ease-in-out;
+        }
+    </style>
 @endsection

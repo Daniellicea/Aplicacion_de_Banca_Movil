@@ -3,60 +3,109 @@
 @section('title', 'Restablecer Contraseña - Bankario')
 
 @section('content')
+    {{-- Contenedor principal con fondo suave --}}
     <div class="min-h-screen bg-gray-50 flex items-center justify-center px-4">
-        <div class="w-full max-w-md bg-white shadow-lg rounded-xl p-8 border border-gray-200">
-            <h2 class="text-2xl font-bold text-center text-gray-800 mb-3">🔐 Restablecer Contraseña</h2>
-            <p class="text-center text-sm text-gray-500 mb-6">
-                Ingresa tu nueva contraseña para tu cuenta Bankario.
-            </p>
+        <div class="w-full max-w-md">
 
-            {{-- Mensajes de error --}}
-            @if ($errors->any())
-                <div class="mb-4 p-3 bg-red-100 border border-red-400 rounded-lg text-red-700 text-sm">
-                    {{ $errors->first() }}
-                </div>
-            @endif
+            {{-- Logo y título (para consistencia) --}}
+            <div class="text-center mb-10 animate-fade-in-down" style="animation-delay: 0.1s;">
+                <h1 class="text-7xl font-extrabold text-blue-700 mb-2 tracking-tighter drop-shadow-md">Bankario</h1>
+                <p class="text-lg text-gray-500 uppercase tracking-widest font-bold">Nueva Contraseña</p>
+            </div>
 
-            {{-- Mensajes de éxito --}}
-            @if (session('success'))
-                <div class="mb-4 p-3 bg-green-100 border border-green-400 rounded-lg text-green-700 text-sm">
-                    {{ session('success') }}
-                </div>
-            @endif
+            {{-- Tarjeta principal: Diseño Elevado y Suave --}}
+            <div class="bg-white border border-gray-100 rounded-2xl p-10 shadow-3xl shadow-blue-200/50
+                        transform transition duration-500 hover:shadow-blue-300/60 animate-fade-in-down" style="animation-delay: 0.3s;">
 
-            <form method="POST" action="{{ route('password.update') }}" class="space-y-6">
-                @csrf
-                <input type="hidden" name="token" value="{{ $token }}">
-                <input type="hidden" name="correo" value="{{ $correo }}">
+                <h2 class="text-3xl font-extrabold text-center text-gray-900 mb-6 tracking-tight flex items-center justify-center gap-2">
+                    <svg class="w-7 h-7 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2v5l-4-4m0 0l-4 4m4-4V3m-4 5h8m-8 0h-8" /></svg>
+                    Restablecer Acceso
+                </h2>
 
-                <div>
-                    <label for="password" class="block text-sm font-semibold text-gray-700 mb-2">
-                        Nueva Contraseña
-                    </label>
-                    <input id="password" name="password" type="password" required
-                           class="w-full px-4 py-2 border rounded-lg focus:border-blue-500 focus:ring focus:ring-blue-200 transition">
-                </div>
+                <p class="text-center text-base text-gray-500 mb-8 border-b border-gray-100 pb-4">
+                    Ingresa y confirma tu nueva contraseña segura.
+                </p>
 
-                <div>
-                    <label for="password_confirmation" class="block text-sm font-semibold text-gray-700 mb-2">
-                        Confirmar Contraseña
-                    </label>
-                    <input id="password_confirmation" name="password_confirmation" type="password" required
-                           class="w-full px-4 py-2 border rounded-lg focus:border-blue-500 focus:ring focus:ring-blue-200 transition">
-                </div>
+                {{-- Mensajes de error (Estilo Premium) --}}
+                @if ($errors->any())
+                    <div class="mb-6 p-4 bg-red-50 border border-red-400 rounded-xl shadow-md text-red-700 text-sm font-semibold flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                        {{ $errors->first() }}
+                    </div>
+                @endif
 
-                <button type="submit"
-                        class="w-full bg-blue-600 text-white font-bold py-2 rounded-lg hover:bg-blue-700 transition">
-                    Guardar nueva contraseña
-                </button>
-            </form>
+                {{-- Mensajes de éxito (Estilo Premium) --}}
+                @if (session('success'))
+                    <div class="mb-6 p-4 bg-green-50 border border-green-400 rounded-xl shadow-md text-green-700 text-sm font-semibold flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                        {{ session('success') }}
+                    </div>
+                @endif
 
-            <p class="text-center text-sm text-gray-500 mt-6">
+                <form method="POST" action="{{ route('password.update') }}" class="space-y-6">
+                    @csrf
+                    <input type="hidden" name="token" value="{{ $token }}">
+                    <input type="hidden" name="correo" value="{{ $correo }}">
+
+                    <div>
+                        <label for="password" class="block text-xs font-bold text-gray-700 uppercase tracking-widest mb-2">
+                            Nueva Contraseña
+                        </label>
+                        <input id="password" name="password" type="password" required
+                               placeholder="Mínimo 8 caracteres"
+                               class="w-full h-12 px-4 text-base bg-gray-50 border border-gray-300 text-gray-900 rounded-xl
+                                      outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-200 transition duration-300 shadow-inner">
+                    </div>
+
+                    <div>
+                        <label for="password_confirmation" class="block text-xs font-bold text-gray-700 uppercase tracking-widest mb-2">
+                            Confirmar Contraseña
+                        </label>
+                        <input id="password_confirmation" name="password_confirmation" type="password" required
+                               placeholder="Confirma la nueva contraseña"
+                               class="w-full h-12 px-4 text-base bg-gray-50 border border-gray-300 text-gray-900 rounded-xl
+                                      outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-200 transition duration-300 shadow-inner">
+                    </div>
+
+                    {{-- Botón: Fondo Degradado y Efecto de Hover más pronunciado --}}
+                    <button type="submit"
+                            class="w-full h-12 text-lg font-extrabold bg-gradient-to-r from-blue-600 to-blue-700
+                                   hover:from-blue-700 hover:to-blue-800 text-white transition duration-300 rounded-xl
+                                   shadow-xl shadow-blue-500/40 mt-8
+                                   transform hover:scale-[1.02] focus:outline-none focus:ring-4 focus:ring-blue-300">
+                        Guardar nueva contraseña
+                    </button>
+                </form>
+
+            </div>
+
+            <p class="text-center text-sm text-gray-500 mt-8 animate-fade-in-down" style="animation-delay: 0.5s;">
                 ¿Recordaste tu contraseña?
-                <a href="{{ route('login.form') }}" class="text-blue-600 hover:underline font-medium">
+                <a href="{{ route('login.form') }}" class="text-blue-600 hover:underline font-extrabold transition-colors">
                     Inicia sesión aquí
                 </a>
             </p>
         </div>
     </div>
+
+    {{-- CSS para Animación de Entrada --}}
+    <style>
+        /* Define la animación para que los elementos caigan ligeramente y aparezcan */
+        @keyframes fadeInSlideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Clase Tailwind customizada */
+        .animate-fade-in-down {
+            opacity: 0; /* Asegura que el elemento esté oculto al inicio */
+            animation: fadeInSlideDown 0.6s ease-out forwards;
+        }
+    </style>
 @endsection
