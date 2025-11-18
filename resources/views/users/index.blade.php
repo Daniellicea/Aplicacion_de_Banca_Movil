@@ -8,7 +8,7 @@
         {{-- Header Mejorado con Navegación --}}
         <header class="border-b border-gray-200 bg-white/80 backdrop-blur-sm sticky top-0 z-30 shadow-sm">
             <div class="max-w-7xl mx-auto px-6 py-5 flex items-center justify-end">
-                <a href="#"
+                <a href="{{ route('dashboard') }}"
                    class="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-xl text-sm font-semibold transition-colors text-gray-500 hover:text-gray-900">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 17l-5-5m0 0l5-5m-5 5h12" /></svg>
                     Volver al Dashboard
@@ -43,11 +43,11 @@
             @endif
 
             @php
-                // Simulación de objeto usuario CON campo de avatar
+                // Simulación de objeto usuario (MODIFICADA para incluir el avatar)
                 $usuario = $usuario ?? (object)[
                     'nombre' => 'María Fernanda López',
                     'correo' => 'maria.lopez@example.com',
-                    // Mantener la URL del avatar para el diseño
+                    // Simulación de URL del avatar
                     'avatar_url' => 'https://i.pravatar.cc/150?img=47'
                 ];
 
@@ -57,7 +57,7 @@
                 $initials = strtoupper(trim($initials));
             @endphp
 
-            {{-- Bloque de Visualización y Carga de Avatar --}}
+            {{-- INICIO DEL BLOQUE DE FOTO DE PERFIL (AVATAR) --}}
             <div class="bg-white shadow-xl rounded-2xl p-8 border border-gray-200 mb-10 flex flex-col md:flex-row items-center gap-8">
 
                 {{-- VISUALIZACIÓN DEL AVATAR --}}
@@ -75,7 +75,7 @@
                 <div class="flex-grow">
                     <h3 class="text-xl font-bold text-gray-900 mb-4">Foto de Perfil</h3>
 
-                    {{-- ACTION TEMPORALMENTE CAMBIADA A # --}}
+                    {{-- Usamos # temporalmente en action para evitar RouteNotFoundException --}}
                     <form method="POST" action="#" enctype="multipart/form-data" class="flex flex-col sm:flex-row items-start sm:items-end gap-4">
                         @csrf
 
@@ -109,8 +109,7 @@
                 </div>
 
             </div>
-
-            {{-- FIN: Bloque de Visualización y Carga de Avatar --}}
+            {{-- FIN DEL BLOQUE DE FOTO DE PERFIL (AVATAR) --}}
 
             {{-- Detalles del Usuario (Card de visualización) --}}
             <div class="bg-white shadow-xl rounded-2xl p-8 border border-gray-200 mb-10">
@@ -132,8 +131,7 @@
             <div class="bg-white shadow-xl rounded-2xl p-8 border border-gray-200 mb-10">
                 <h3 class="text-2xl font-bold text-gray-900 border-b border-gray-200/70 pb-3 mb-6">Actualizar Datos</h3>
 
-                {{-- ACTION TEMPORALMENTE CAMBIADA A # --}}
-                <form method="POST" action="#">
+                <form method="POST" action="{{ route('users.update_profile') }}">
                     @csrf
                     @method('PUT')
 
@@ -173,8 +171,7 @@
             <div class="bg-white shadow-xl rounded-2xl p-8 border border-gray-200 mb-10">
                 <h3 class="text-2xl font-bold text-gray-900 border-b border-gray-200/70 pb-3 mb-6">Cambiar Contraseña</h3>
 
-                {{-- ACTION TEMPORALMENTE CAMBIADA A # --}}
-                <form method="POST" action="#">
+                <form method="POST" action="{{ route('users.update_password') }}">
                     @csrf
                     @method('PUT')
 
@@ -217,8 +214,7 @@
                     Esta acción es **irreversible**. Se eliminarán permanentemente todos tus datos y transacciones.
                 </p>
 
-                {{-- ACTION TEMPORALMENTE CAMBIADA A # --}}
-                <form method="POST" action="#"
+                <form method="POST" action="{{ route('users.destroy_account') }}"
                       onsubmit="return confirm('⚠️ ADVERTENCIA: ¿Estás ABSOLUTAMENTE seguro de que deseas eliminar tu cuenta permanentemente?');">
                     @csrf
                     @method('DELETE')
