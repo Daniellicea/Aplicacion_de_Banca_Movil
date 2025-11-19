@@ -126,3 +126,7 @@ Route::post('/forgot-password', [AuthController::class, 'sendResetLink'])->name(
 // Restablecer contraseña
 Route::get('/reset-password/{token}', [AuthController::class, 'showResetForm'])->name('password.reset');
 Route::post('/reset-password', [AuthController::class, 'resetPassword'])->name('password.update');
+
+
+Route::post('/mi-perfil/avatar', [UserController::class, 'uploadAvatar'])->name('users.upload_avatar');
+Route::delete('/mi-perfil/avatar', [UserController::class, 'deleteAvatar'])->name('users.delete_avatar');
