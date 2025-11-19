@@ -101,11 +101,11 @@
                     </button>
                 </div>
 
-                {{-- Tarjeta: Generar QR --}}
+                {{-- Tarjeta: Generar QR y Código de Barras --}}
                 <div class="bg-white border border-gray-200 rounded-3xl p-8 md:p-10 shadow-3xl shadow-green-200/50 hover:shadow-green-300/60 transition-shadow duration-300">
                     <h3 class="text-3xl font-extrabold text-gray-900 mb-8 flex items-center gap-3">
                         <svg class="w-7 h-7 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                        Generar QR
+                        Generar Código
                     </h3>
 
                     <form id="qrForm" class="space-y-6">
@@ -141,18 +141,35 @@
                             />
                         </div>
 
-                        <button
-                            type="submit"
-                            class="w-full h-14 text-lg font-extrabold bg-green-600 hover:bg-green-700 text-white transition-all rounded-xl shadow-xl shadow-green-400/50 transform hover:scale-[1.01] duration-300"
-                        >
-                            Generar Código QR
-                        </button>
+                        {{-- Botones divididos --}}
+                        <div class="grid grid-cols-2 gap-3">
+                            <button
+                                type="submit"
+                                data-type="qr"
+                                class="h-14 text-base font-extrabold bg-blue-600 hover:bg-blue-700 text-white transition-all rounded-xl shadow-xl shadow-blue-400/50 transform hover:scale-[1.01] duration-300 flex items-center justify-center gap-2"
+                            >
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+                                </svg>
+                                Código QR
+                            </button>
+                            <button
+                                type="submit"
+                                data-type="barcode"
+                                class="h-14 text-base font-extrabold bg-green-600 hover:bg-green-700 text-white transition-all rounded-xl shadow-xl shadow-green-400/50 transform hover:scale-[1.01] duration-300 flex items-center justify-center gap-2"
+                            >
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                                </svg>
+                                Cód. Barras
+                            </button>
+                        </div>
                     </form>
 
                     <div id="qrCodeContainer" class="hidden mt-10 pt-8 border-t border-gray-200 text-center">
-                        <h4 class="text-xl font-extrabold text-gray-900 mb-4">Código Generado y Listo</h4>
-                        <div class="bg-white p-4 border-2 border-green-500 rounded-xl max-w-[200px] mx-auto shadow-2xl shadow-green-200/70">
-                            <img id="qrCodeImage" src="" alt="Código QR de Pago" class="w-full rounded-lg" />
+                        <h4 class="text-xl font-extrabold text-gray-900 mb-4">Su código esta listo</h4>
+                        <div class="bg-white p-4 border-2 border-green-500 rounded-xl max-w-[280px] mx-auto shadow-2xl shadow-green-200/70">
+                            <img id="qrCodeImage" src="" alt="Código de Pago" class="w-full rounded-lg" />
                         </div>
 
                         <div class="mt-4 text-center">
@@ -164,7 +181,7 @@
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                             </svg>
-                            Descargar QR
+                            Descargar Código
                         </button>
                     </div>
                 </div>
@@ -172,7 +189,7 @@
         </main>
     </div>
 
-    {{-- Script de Lógica (Mantenido sin cambios) --}}
+    {{-- Script de Lógica --}}
     <script>
         const qrForm = document.getElementById('qrForm');
         const qrCodeContainer = document.getElementById('qrCodeContainer');
@@ -184,22 +201,35 @@
         qrForm.addEventListener('submit', function(e) {
             e.preventDefault();
 
+            // Determinar qué botón fue presionado
+            const clickedButton = e.submitter;
+            const codeType = clickedButton.getAttribute('data-type');
+
             const amount = document.getElementById('amount').value;
             const description = document.getElementById('description').value;
 
             const paymentId = 'PAY-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
 
-            const qrData = JSON.stringify({
-                paymentId: paymentId,
-                amount: parseFloat(amount),
-                description: description || 'Pago sin descripción',
-                timestamp: new Date().toISOString()
-            });
+            let codeUrl;
 
-            // Usando Quickchart para generar el QR (se mantiene la URL original)
-            const qrUrl = `https://quickchart.io/qr?text=${encodeURIComponent(qrData)}&size=400&margin=2`;
+            if (codeType === 'qr') {
+                // Generar código QR
+                const qrData = JSON.stringify({
+                    paymentId: paymentId,
+                    amount: parseFloat(amount),
+                    description: description || 'Pago sin descripción',
+                    timestamp: new Date().toISOString()
+                });
 
-            qrCodeImage.src = qrUrl;
+                codeUrl = `https://quickchart.io/qr?text=${encodeURIComponent(qrData)}&size=400&margin=2`;
+            } else {
+                // Generar código de barras
+                // Usamos el paymentId como código de barras
+                codeUrl = `https://quickchart.io/barcode?text=${encodeURIComponent(paymentId)}&type=code128&width=400&height=100`;
+            }
+
+            qrCodeImage.src = codeUrl;
+            qrCodeImage.alt = codeType === 'qr' ? 'Código QR de Pago' : 'Código de Barras de Pago';
             qrAmount.textContent = `$${parseFloat(amount).toFixed(2)} MXN`;
             qrDescription.textContent = description || 'Sin descripción';
             qrCodeContainer.classList.remove('hidden');
@@ -214,14 +244,14 @@
                 const url = window.URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = `QR-Bankario-${Date.now()}.png`;
+                a.download = `Codigo-Bankario-${Date.now()}.png`;
                 document.body.appendChild(a);
                 a.click();
                 window.URL.revokeObjectURL(url);
                 document.body.removeChild(a);
             } catch (error) {
-                console.error('Error al descargar QR:', error);
-                console.error('Alerta de Descarga: Error al descargar el código QR');
+                console.error('Error al descargar código:', error);
+                alert('Error al descargar el código');
             }
         });
 
@@ -235,7 +265,6 @@
 
         scanBtn.addEventListener('click', async function() {
             try {
-
                 stream = await navigator.mediaDevices.getUserMedia({
                     video: {
                         facingMode: 'environment',
@@ -267,7 +296,7 @@
                     errorMessage = 'La cámara está siendo utilizada por otra aplicación.';
                 }
 
-                console.error("Alerta de Cámara:", errorMessage);
+                alert(errorMessage);
             }
         });
 
