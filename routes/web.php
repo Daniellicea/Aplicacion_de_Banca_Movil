@@ -13,18 +13,37 @@ use App\Http\Controllers\UserController;
 
 /*
 |--------------------------------------------------------------------------
-| Rutas de Invitado (Sin Login)
+| RUTA PRINCIPAL – SIEMPRE IR A LOGIN Y CERRAR SESIÓN
+|--------------------------------------------------------------------------
+*/
+Route::get('/', function () {
+    auth()->logout();       // Cierra sesión si existía
+    return redirect('/login');
+});
+
+
+/*
+|--------------------------------------------------------------------------
+| LOGIN – SIEMPRE MOSTRAR LOGIN Y CERRAR SESIÓN
+|--------------------------------------------------------------------------
+*/
+
+// Importante: NO usar session()->flush() porque rompe CSRF.
+Route::get('/login', function () {
+    auth()->logout();  // Cierra sesión, pero deja CSRF activo
+    return app(AuthController::class)->showLogin();
+})->name('login.form');
+
+// Procesar el login (POST)
+Route::post('/login', [AuthController::class, 'login'])->name('login');
+
+
+/*
+|--------------------------------------------------------------------------
+| REGISTRO – SOLO INVITADOS
 |--------------------------------------------------------------------------
 */
 Route::middleware('guest')->group(function () {
-
-    Route::redirect('/', '/login');
-
-    // Login
-    Route::get('/login', [AuthController::class, 'showLogin'])->name('login.form');
-    Route::post('/login', [AuthController::class, 'login'])->name('login');
-
-    // Registro
     Route::get('/register', [AuthController::class, 'showRegister'])->name('register.form');
     Route::post('/register', [AuthController::class, 'register'])->name('register');
 });
@@ -32,10 +51,10 @@ Route::middleware('guest')->group(function () {
 
 /*
 |--------------------------------------------------------------------------
-| Rutas Protegidas (Con Login)
+| RUTAS PROTEGIDAS – SOLO USUARIOS AUTENTICADOS
 |--------------------------------------------------------------------------
 */
-Route::middleware('auth.session')->group(function () {
+Route::middleware('auth')->group(function () {
 
     /*
     | Dashboard
@@ -43,44 +62,31 @@ Route::middleware('auth.session')->group(function () {
     Route::get('/dashboard', [HomeController::class, 'home'])->name('dashboard');
     Route::get('/home', [HomeController::class, 'home'])->name('home');
 
-
     /*
-    | Logout
+    | Logout manual
     */
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-
 
     /*
     | Seguridad / 2FA
     */
     Route::get('/security', [AuthController::class, 'security'])->name('security');
-
-    // Activar 2FA
     Route::post('/security/2fa/enable', [AuthController::class, 'enableTwoFactor'])->name('security.2fa.enable');
-
-    // Verificar código en configuración
     Route::post('/security/2fa/verify', [AuthController::class, 'verifyTwoFactor'])->name('security.2fa.verify');
-
-    // Vista después del login para ingresar código 2FA
     Route::get('/2fa/verify', [AuthController::class, 'showTwoFactorPrompt'])->name('2fa.prompt');
-
-    // Acción de desactivar 2FA
     Route::post('/security/2fa/disable', [AuthController::class, 'disableTwoFactor'])->name('security.2fa.disable');
 
-
     /*
-    | Layouts demo
+    | Layouts de prueba
     */
     Route::get('/layouts/app', [LayoutsController::class, 'app'])->name('layouts.app');
     Route::get('/layouts/cards', [LayoutsController::class, 'cards'])->name('layouts.cards');
-
 
     /*
     | Soporte
     */
     Route::get('/support', [SupportController::class, 'support'])->name('support');
     Route::post('/support', [SupportController::class, 'store'])->name('support.store');
-
 
     /*
     | Transacciones
@@ -94,9 +100,8 @@ Route::middleware('auth.session')->group(function () {
         Route::post('/qr-payments', [TransactionsController::class, 'generateQr'])->name('qr-payments.generate');
     });
 
-
     /*
-    | Perfil y Cuenta Usuario
+    | Perfil y Cuenta usuario
     */
     Route::get('/mi-perfil', [UserController::class, 'profile'])->name('users.profile');
     Route::put('/mi-perfil', [UserController::class, 'updateProfile'])->name('users.update_profile');
@@ -105,28 +110,23 @@ Route::middleware('auth.session')->group(function () {
 
     Route::get('/users/account', [UserController::class, 'account'])->name('users.account');
 
-
     /*
-    | CRUD admin de usuarios
+    | CRUD Admin de usuarios
     */
     Route::resource('usuarios', UserController::class)->names('usuarios');
 });
 
 
-
-
-/*---------------------------------------------------------------------------------------
-Nuevas rutas(no modificar)*/
-
-
-// Recuperación de contraseña
+/*
+|--------------------------------------------------------------------------
+| Recuperación de contraseña
+|--------------------------------------------------------------------------
+*/
 Route::get('/forgot-password', [AuthController::class, 'showForgotPassword'])->name('password.request');
 Route::post('/forgot-password', [AuthController::class, 'sendResetLink'])->name('password.email');
 
-// Restablecer contraseña
 Route::get('/reset-password/{token}', [AuthController::class, 'showResetForm'])->name('password.reset');
 Route::post('/reset-password', [AuthController::class, 'resetPassword'])->name('password.update');
-
 
 Route::post('/mi-perfil/avatar', [UserController::class, 'uploadAvatar'])->name('users.upload_avatar');
 Route::delete('/mi-perfil/avatar', [UserController::class, 'deleteAvatar'])->name('users.delete_avatar');

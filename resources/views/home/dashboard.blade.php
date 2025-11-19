@@ -20,12 +20,13 @@
 
                             {{-- Avatar --}}
                             <div class="w-8 h-8 flex items-center justify-center rounded-full bg-blue-600 text-white font-extrabold text-sm shadow-md">
-                                {{ substr(session('usuario_nombre') ?? 'U', 0, 1) }}
+                                {{ strtoupper(substr(auth()->user()->nombre, 0, 1)) }}
                             </div>
 
                             {{-- Nombre --}}
-                            <span class="ml-2 mr-1 text-sm font-bold text-gray-700 hidden sm:inline">{{ session('usuario_nombre') ?? 'Usuario' }}</span>
-
+                            <span class="ml-2 mr-1 text-sm font-bold text-gray-700 hidden sm:inline">
+                                {{ auth()->user()->nombre }}
+                            </span>
                             {{-- Icono --}}
                             <svg class="w-4 h-4 ml-1 text-gray-400 transition-transform duration-300" :class="{ 'rotate-180 text-blue-600': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
@@ -42,7 +43,8 @@
                              class="absolute right-0 mt-3 w-64 rounded-xl shadow-2xl bg-white ring-1 ring-black ring-opacity-5 z-50 origin-top-right">
 
                             <div class="p-4 border-b border-gray-100">
-                                <p class="text-lg font-extrabold text-gray-900">{{ session('usuario_nombre') ?? 'Usuario' }}</p>
+                                <p class="text-lg font-extrabold text-gray-900">
+                                    {{ auth()->user()->nombre }}</p>
                                 <p class="text-xs text-gray-500 font-medium mt-1">Sesión iniciada</p>
                             </div>
 
@@ -73,8 +75,8 @@
             {{-- SECCIÓN 1: BIENVENIDA (Tipografía mejorada) --}}
             <div class="mb-14 animate-fade-in-up" style="animation-delay: 0.1s;">
                 <h2 class="text-6xl sm:text-7xl font-extrabold text-gray-900 mb-3 leading-tight">
-                    Hola, <span class="text-blue-600 relative after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-full after:h-1 after:bg-blue-300 after:rounded-full after:animate-pulse">
-                        {{ session('usuario_nombre') ?? 'Usuario' }}
+                    Hola, <span class="text-blue-600">
+                        {{ auth()->user()->nombre }}
                     </span>
                 </h2>
                 {{-- Aumento de tamaño para complementar el título --}}

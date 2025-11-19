@@ -38,16 +38,14 @@ class AuthController extends Controller
 
         if ($usuario && Hash::check($request->password, $usuario->contrasena)) {
 
-            // LOGIN REAL DE LARAVEL
             auth()->login($usuario);
 
-            // 2FA activado
+            // 2FA
             if ($usuario->two_factor_enabled) {
                 session(['two_factor_pending' => true]);
-                return redirect()->route('2fa.prompt')->with('info', 'Ingresa tu código 2FA');
+                return redirect()->route('2fa.prompt');
             }
 
-            // Refrescar sesión
             $request->session()->regenerate();
 
             return redirect()->route('dashboard');
@@ -78,7 +76,6 @@ class AuthController extends Controller
     public function logout(Request $request)
     {
         auth()->logout();
-        session()->flush();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
@@ -206,7 +203,10 @@ class AuthController extends Controller
             ['token' => $token, 'created_at' => Carbon::now()]
         );
 
-        Mail::send('emails.reset-password', compact('token', 'usuario'), function ($message) use ($usuario) {
+        Mail::send('emails.reset-password', [
+            'token' => $token,
+            'usuario' => $usuario
+        ], function ($message) use ($usuario) {
             $message->to($usuario->correo)->subject('Restablecer Contraseña');
         });
 

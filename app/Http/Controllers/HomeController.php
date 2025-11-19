@@ -8,23 +8,26 @@ class HomeController extends Controller
 {
     public function home()
     {
-        // Toma el id guardado por tu middleware/login
-        $id = session('usuario_id');
+        // Obtener usuario autenticado correctamente
+        $usuario = auth()->user();  // ← ESTA ES LA FORMA CORRECTA EN LARAVEL
 
-        // Carga el usuario fresco desde la BD
-        $usuario = $id ? Usuario::find($id) : null;
-
-        // Inicializar saldo real si no existe (para pruebas)
+        // Inicializar saldo real si no existe (solo para pruebas o demo)
         if (!session()->has('saldo_real')) {
             session(['saldo_real' => 5000.00]);
         }
+
         $saldo_real = session('saldo_real');
 
         // Otros datos opcionales del dashboard
         $totalIngresos = 8500.00;
         $totalGastos = 545.50;
 
-        // Retornar vista con usuario y saldo
-        return view('home.dashboard', compact('usuario', 'saldo_real', 'totalIngresos', 'totalGastos'));
+        // Pasar datos a la vista del dashboard
+        return view('home.dashboard', compact(
+            'usuario',
+            'saldo_real',
+            'totalIngresos',
+            'totalGastos'
+        ));
     }
 }
