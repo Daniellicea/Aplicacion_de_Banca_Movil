@@ -74,6 +74,7 @@
                 {{-- Campos de Transferencia --}}
                 <div id="transfer-fields" class="bg-white p-8 rounded-2xl shadow-xl border border-gray-200">
 
+                    {{-- Cuenta de Origen --}}
                     <div class="space-y-3 mb-8">
                         <label for="source_account" class="block text-xs font-bold text-gray-500 uppercase tracking-widest">
                             Cuenta de Origen
@@ -96,6 +97,7 @@
                         <p class="text-sm text-gray-500 mt-1 font-semibold" id="current-balance-info">Saldo disponible: $0.00</p>
                     </div>
 
+                    {{-- Cuenta Destino --}}
                     <div class="space-y-3">
                         <label for="account" class="block text-xs font-bold text-gray-500 uppercase tracking-widest">
                             Cuenta Destino
@@ -111,6 +113,7 @@
                         />
                     </div>
 
+                    {{-- Monto --}}
                     <div class="space-y-3 mt-8">
                         <label for="amount" class="block text-xs font-bold text-gray-500 uppercase tracking-widest">
                             Monto ($)
@@ -129,24 +132,7 @@
                         <p class="text-sm text-gray-500 mt-1">El monto debe ser mayor a 0</p>
                     </div>
 
-                    <div class="space-y-3 mt-8">
-                        <label for="reference" class="block text-xs font-bold text-gray-500 uppercase tracking-widest">
-                            Referencia Numérica (Mín. 7 dígitos)
-                        </label>
-                        <input
-                            id="reference"
-                            name="reference"
-                            type="text"
-                            placeholder="Referencia o Clave de Rastreo"
-                            maxlength="15"
-                            pattern="[0-9]{7,15}"
-                            class="w-full h-14 px-4 text-base bg-gray-50 border border-gray-300 rounded-xl shadow-inner-sm
-                                   focus:border-blue-600 focus:ring-2 focus:ring-blue-200 transition duration-300 outline-none"
-                            required
-                        />
-                        <p class="text-sm text-gray-500 mt-1">Campo obligatorio para el rastreo de la operación.</p>
-                    </div>
-
+                    {{-- Descripción/Concepto (Opcional) --}}
                     <div class="space-y-3 mt-8">
                         <label for="description" class="block text-xs font-bold text-gray-500 uppercase tracking-widest">
                             Descripción/Concepto (Opcional)
@@ -257,7 +243,6 @@
             document.getElementById('operation_type').value = type;
             const accountInput = document.getElementById('account');
             const amountInput = document.getElementById('amount');
-            const referenceInput = document.getElementById('reference');
             const sourceAccountSelect = document.getElementById('source_account');
 
             // Limpieza de clases de los botones
@@ -283,7 +268,6 @@
                 // Habilitar y requerir campos de transferencia
                 accountInput.setAttribute('required', 'required');
                 amountInput.setAttribute('required', 'required');
-                referenceInput.setAttribute('required', 'required');
                 sourceAccountSelect.setAttribute('required', 'required');
 
                 updateBalanceInfo();
@@ -304,7 +288,6 @@
                 // Deshabilitar campos de transferencia
                 accountInput.removeAttribute('required');
                 amountInput.removeAttribute('required');
-                referenceInput.removeAttribute('required');
                 sourceAccountSelect.removeAttribute('required');
 
                 // Generar el QR al cambiar al modo depósito
@@ -341,18 +324,9 @@
                     amountInput.focus();
                     return false;
                 }
-
-                const referenceInput = document.getElementById('reference').value.trim();
-                const referencePattern = document.getElementById('reference').getAttribute('pattern');
-                const regex = new RegExp(referencePattern);
-
-                if (!regex.test(referenceInput)) {
-                    alert('La Referencia Numérica debe contener entre 7 y 15 dígitos.');
-                    document.getElementById('reference').focus();
-                    return false;
-                }
             }
 
+            // Si es depósito, el formulario no se envía (porque el botón de submit está oculto)
             return operationType === 'transfer';
         }
 
