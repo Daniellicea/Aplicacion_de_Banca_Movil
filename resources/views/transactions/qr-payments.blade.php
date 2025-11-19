@@ -167,7 +167,7 @@
                     </form>
 
                     <div id="qrCodeContainer" class="hidden mt-10 pt-8 border-t border-gray-200 text-center">
-                        <h4 class="text-xl font-extrabold text-gray-900 mb-4">Su código esta listo</h4>
+                        <h4 class="text-xl font-extrabold text-gray-900 mb-4">Sucódigo esta listo</h4>
                         <div class="bg-white p-4 border-2 border-green-500 rounded-xl max-w-[280px] mx-auto shadow-2xl shadow-green-200/70">
                             <img id="qrCodeImage" src="" alt="Código de Pago" class="w-full rounded-lg" />
                         </div>
