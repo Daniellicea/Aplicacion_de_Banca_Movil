@@ -1,3 +1,6 @@
+
+//Sin errores
+
 @extends('layouts.app')
 
 @section('title', 'Pagos QR - Bankario')
