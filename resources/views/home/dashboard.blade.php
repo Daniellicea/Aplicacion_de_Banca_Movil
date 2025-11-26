@@ -1,6 +1,3 @@
-
-// Buen funcionamiento sin errores
-
 @extends('layouts.app')
 
 @section('title', 'Dashboard - Bankario')
