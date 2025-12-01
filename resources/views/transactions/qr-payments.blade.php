@@ -119,6 +119,7 @@
                                 name="amount"
                                 type="number"
                                 step="0.01"
+                                min="0.01"
                                 placeholder="0.00"
                                 class="w-full h-14 px-5 text-xl font-mono bg-gray-50 border border-gray-300 rounded-xl shadow-inner-sm
                                        focus:border-blue-600 focus:ring-2 focus:ring-blue-200 transition duration-300 outline-none"
@@ -167,7 +168,7 @@
                     </form>
 
                     <div id="qrCodeContainer" class="hidden mt-10 pt-8 border-t border-gray-200 text-center">
-                        <h4 class="text-xl font-extrabold text-gray-900 mb-4">Sucódigo esta listo</h4>
+                        <h4 class="text-xl font-extrabold text-gray-900 mb-4">Tu código está listo</h4>
                         <div class="bg-white p-4 border-2 border-green-500 rounded-xl max-w-[280px] mx-auto shadow-2xl shadow-green-200/70">
                             <img id="qrCodeImage" src="" alt="Código de Pago" class="w-full rounded-lg" />
                         </div>
