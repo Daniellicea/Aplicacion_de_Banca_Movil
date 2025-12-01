@@ -103,10 +103,26 @@
 
                 {{-- Tarjeta: Generar QR y Código de Barras --}}
                 <div class="bg-white border border-gray-200 rounded-3xl p-8 md:p-10 shadow-3xl shadow-green-200/50 hover:shadow-green-300/60 transition-shadow duration-300">
-                    <h3 class="text-3xl font-extrabold text-gray-900 mb-8 flex items-center gap-3">
+                    <h3 class="text-3xl font-extrabold text-gray-900 mb-6 flex items-center gap-3">
                         <svg class="w-7 h-7 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                         Generar Código
                     </h3>
+
+                    {{-- Mostrar Saldo Disponible --}}
+                    <div class="mb-6 p-5 bg-gradient-to-r from-blue-50 to-blue-100 border border-blue-200 rounded-xl">
+                        <p class="text-sm font-bold text-gray-600 mb-2">💰 Saldo Disponible Total:</p>
+                        <p class="text-3xl font-extrabold text-blue-600">${{ number_format($saldo_total ?? 0, 2) }} MXN</p>
+                        <div class="mt-3 pt-3 border-t border-blue-200 grid grid-cols-2 gap-2 text-xs text-gray-600">
+                            <div>
+                                <span class="font-semibold">Principal:</span>
+                                <span class="ml-1">${{ number_format($saldo_real ?? 0, 2) }}</span>
+                            </div>
+                            <div>
+                                <span class="font-semibold">Ahorros:</span>
+                                <span class="ml-1">${{ number_format($saldo_ahorros ?? 0, 2) }}</span>
+                            </div>
+                        </div>
+                    </div>
 
                     <form id="qrForm" class="space-y-6">
                         {{-- Monto --}}
@@ -120,11 +136,18 @@
                                 type="number"
                                 step="0.01"
                                 min="0.01"
+                                max="{{ $saldo_total ?? 0 }}"
                                 placeholder="0.00"
                                 class="w-full h-14 px-5 text-xl font-mono bg-gray-50 border border-gray-300 rounded-xl shadow-inner-sm
                                        focus:border-blue-600 focus:ring-2 focus:ring-blue-200 transition duration-300 outline-none"
                                 required
                             />
+                            <p id="amountError" class="hidden text-red-600 text-sm font-semibold flex items-center gap-1 mt-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <span id="amountErrorText"></span>
+                            </p>
                         </div>
 
                         {{-- Descripción --}}
@@ -192,23 +215,76 @@
 
     {{-- Script de Lógica --}}
     <script>
+        // Saldo disponible desde Laravel
+        const SALDO_TOTAL = {{ $saldo_total ?? 0 }};
+
         const qrForm = document.getElementById('qrForm');
         const qrCodeContainer = document.getElementById('qrCodeContainer');
         const qrCodeImage = document.getElementById('qrCodeImage');
         const qrAmount = document.getElementById('qrAmount');
         const qrDescription = document.getElementById('qrDescription');
         const downloadQrBtn = document.getElementById('downloadQrBtn');
+        const amountInput = document.getElementById('amount');
+        const amountError = document.getElementById('amountError');
+        const amountErrorText = document.getElementById('amountErrorText');
+
+        // Validación en tiempo real
+        amountInput.addEventListener('input', function() {
+            const value = parseFloat(this.value);
+
+            // Limpiar error
+            amountError.classList.add('hidden');
+            this.classList.remove('border-red-500', 'focus:ring-red-200');
+
+            // Validar número negativo
+            if (value < 0) {
+                this.value = '';
+                showError('No se permiten montos negativos');
+                return;
+            }
+
+            // Validar que no sea cero
+            if (value === 0) {
+                showError('El monto debe ser mayor a $0.00');
+                return;
+            }
+
+            // Validar saldo insuficiente
+            if (value > SALDO_TOTAL) {
+                showError(`⚠️ Saldo insuficiente. Disponible: $${SALDO_TOTAL.toFixed(2)} MXN`);
+                return;
+            }
+        });
+
+        function showError(message) {
+            amountErrorText.textContent = message;
+            amountError.classList.remove('hidden');
+            amountInput.classList.add('border-red-500', 'focus:ring-red-200');
+        }
 
         qrForm.addEventListener('submit', function(e) {
             e.preventDefault();
+
+            const amount = parseFloat(amountInput.value);
+
+            // Validaciones antes de enviar
+            if (!amount || amount <= 0) {
+                showError('Ingresa un monto válido mayor a $0.00');
+                amountInput.focus();
+                return;
+            }
+
+            if (amount > SALDO_TOTAL) {
+                showError(`⚠️ Saldo insuficiente. Disponible: $${SALDO_TOTAL.toFixed(2)} MXN`);
+                amountInput.focus();
+                return;
+            }
 
             // Determinar qué botón fue presionado
             const clickedButton = e.submitter;
             const codeType = clickedButton.getAttribute('data-type');
 
-            const amount = document.getElementById('amount').value;
             const description = document.getElementById('description').value;
-
             const paymentId = 'PAY-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
 
             let codeUrl;
@@ -217,7 +293,7 @@
                 // Generar código QR
                 const qrData = JSON.stringify({
                     paymentId: paymentId,
-                    amount: parseFloat(amount),
+                    amount: amount,
                     description: description || 'Pago sin descripción',
                     timestamp: new Date().toISOString()
                 });
@@ -225,13 +301,12 @@
                 codeUrl = `https://quickchart.io/qr?text=${encodeURIComponent(qrData)}&size=400&margin=2`;
             } else {
                 // Generar código de barras
-                // Usamos el paymentId como código de barras
                 codeUrl = `https://quickchart.io/barcode?text=${encodeURIComponent(paymentId)}&type=code128&width=400&height=100`;
             }
 
             qrCodeImage.src = codeUrl;
             qrCodeImage.alt = codeType === 'qr' ? 'Código QR de Pago' : 'Código de Barras de Pago';
-            qrAmount.textContent = `$${parseFloat(amount).toFixed(2)} MXN`;
+            qrAmount.textContent = `$${amount.toFixed(2)} MXN`;
             qrDescription.textContent = description || 'Sin descripción';
             qrCodeContainer.classList.remove('hidden');
 
@@ -256,6 +331,7 @@
             }
         });
 
+        // === Scanner QR Code ===
         const scanBtn = document.getElementById('scanBtn');
         const stopScanBtn = document.getElementById('stopScanBtn');
         const video = document.getElementById('qrVideo');
