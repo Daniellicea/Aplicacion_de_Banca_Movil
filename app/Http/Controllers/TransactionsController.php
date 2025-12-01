@@ -16,67 +16,113 @@ class TransactionsController extends Controller
         return view('transactions.qr-payments');
     }
 
+    /* ===========================
+       VISTA DE TRANSFERENCIA
+       =========================== */
+
     public function transfer()
     {
-        // Inicializar saldo y movimientos si no existen en sesión
-        if (!session()->has('saldo_real')) {
-            session([
-                'saldo_real' => 5000.00, // saldo inicial
-                'transactions' => [
-                    [
-                        'description' => 'Depósito Nómina',
-                        'date' => date('Y-m-d'),
-                        'amount' => 5000.00,
-                        'type' => 'credit',
-                    ],
-                ],
-            ]);
-        }
+        /* =========
+           SALDOS
+           ========= */
+
+        if (!session()->has('saldo_real')) session(['saldo_real' => 5000.00]);
+        if (!session()->has('saldo_ahorros')) session(['saldo_ahorros' => 15250.75]);
+
+        /* =========
+           CUENTAS
+           ========= */
+
+        $cuentas = [
+            [
+                'id' => 'principal',
+                'name' => 'Saldo Principal',
+                'balance' => session('saldo_real')
+            ],
+            [
+                'id' => 'ahorros',
+                'name' => 'Ahorros Personales',
+                'balance' => session('saldo_ahorros')
+            ]
+        ];
+
+        /* ============
+           MIS DATOS
+           ============ */
 
         $saldo = session('saldo_real');
-        $transactions = session('transactions');
+        $saldo_ahorros = session('saldo_ahorros');
+        $transactions = session('transactions', []);
 
-        // Ejemplo de contactos recientes
         $recentContacts = [
             ['name' => 'Juan Pérez', 'account' => '1234567890'],
             ['name' => 'María López', 'account' => '0987654321'],
             ['name' => 'Carlos García', 'account' => '1122334455'],
         ];
 
-        return view('transactions.transfers', compact('recentContacts', 'saldo', 'transactions'));
+        return view('transactions.transfers', [
+            'saldo' => $saldo,
+            'saldo_ahorros' => $saldo_ahorros,
+            'transactions' => $transactions,
+            'recentContacts' => $recentContacts,
+            'userAccounts' => $cuentas // ✅ ESTO ES LO QUE TU VISTA NECESITA
+        ]);
     }
+
+    /* ===========================
+       PROCESO DE TRANSFERENCIA
+       =========================== */
 
     public function store(Request $request)
-    {
-        $request->validate([
-            'account' => 'required|string',
-            'amount' => 'required|numeric|min:1',
-            'description' => 'nullable|string',
-        ]);
+{
+    $request->validate([
+        'account' => 'required|string',
+        'amount' => 'required|numeric|min:1',
+        'source_account' => 'required|string|in:principal,ahorros',
+        'description' => 'nullable|string|max:100',
+    ]);
 
-        $saldo = session('saldo_real');
-        $monto = $request->amount;
+    $monto = floatval($request->amount);
+    $source = $request->source_account;
 
-        // Validar saldo suficiente
-        if ($monto > $saldo) {
-            return back()->withErrors(['amount' => 'No tienes saldo suficiente para realizar esta transferencia.']);
-        }
+    // Inicializar saldos
+    if (!session()->has('saldo_real')) session(['saldo_real' => 5000.00]);
+    if (!session()->has('saldo_ahorros')) session(['saldo_ahorros' => 15250.75]);
 
-        // Restar monto del saldo real
-        $saldo -= $monto;
-        session(['saldo_real' => $saldo]);
+    $saldo_real = session('saldo_real');
+    $saldo_ahorros = session('saldo_ahorros');
 
-        // Agregar la transferencia a movimientos
-        $transactions = session('transactions');
-        $transactions[] = [
-            'description' => $request->description ?: 'Transferencia a ' . $request->account,
-            'date' => date('Y-m-d'),
-            'amount' => -$monto,
-            'type' => 'debit',
-        ];
-        session(['transactions' => $transactions]);
-
-        return redirect()->route('transactions.transfer')
-            ->with('success', 'Transferencia realizada correctamente.');
+    // ✅ VALIDACIÓN SERIA: no permitir saldos negativos
+    if ($source === 'ahorros' && $monto > $saldo_ahorros) {
+        return back()->withErrors(['amount' => 'Saldo insuficiente en Ahorros Personales.']);
     }
+
+    if ($source === 'principal' && $monto > $saldo_real) {
+        return back()->withErrors(['amount' => 'Saldo insuficiente en Saldo Principal.']);
+    }
+
+    // ✅ DESCUENTO CONTROLADO
+    if ($source === 'ahorros') {
+        session(['saldo_ahorros' => $saldo_ahorros - $monto]);
+        $accountName = 'Ahorros Personales';
+    } else {
+        session(['saldo_real' => $saldo_real - $monto]);
+        $accountName = 'Saldo Principal';
+    }
+
+    // ✅ REGISTRAR MOVIMIENTO
+    $transactions = session('transactions', []);
+    $transactions[] = [
+        'description' => $request->description ?: 'Transferencia a ' . $request->account,
+        'date' => date('Y-m-d H:i'),
+        'amount' => -$monto,
+        'type' => 'debit',
+        'account' => $accountName,
+    ];
+
+    session(['transactions' => $transactions]);
+
+    return redirect()->route('transactions.transfer')
+        ->with('success', 'Transferencia realizada correctamente desde ' . $accountName);
+}
 }

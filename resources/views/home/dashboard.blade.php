@@ -118,7 +118,9 @@
                         foreach($transactions as $t) {
                             if(($t['type'] ?? '') === 'debit') $gastos += abs($t['amount'] ?? 0);
                         }
-                        $saldo_actual = $saldo_real - $gastos;
+                        // $saldo_actual = $saldo_real - $gastos;
+                        $saldo_actual = $saldo_real;
+
                         $saldo_formateado = number_format($saldo_actual, 2);
 
                         // Formato del saldo oculto (ej. $5,000.00 -> $***.00)
