@@ -13,9 +13,22 @@ class TransactionsController extends Controller
 
     public function qr()
     {
-        return view('transactions.qr-payments');
-    }
+        // Inicializar saldos si no existen
+        if (!session()->has('saldo_real')) session(['saldo_real' => 5000.00]);
+        if (!session()->has('saldo_ahorros')) session(['saldo_ahorros' => 15250.75]);
 
+        $saldo_real = session('saldo_real');
+        $saldo_ahorros = session('saldo_ahorros');
+
+        // Saldo total disponible
+        $saldo_total = $saldo_real + $saldo_ahorros;
+
+        return view('transactions.qr-payments', [
+            'saldo_real' => $saldo_real,
+            'saldo_ahorros' => $saldo_ahorros,
+            'saldo_total' => $saldo_total
+        ]);
+    }
     /* ===========================
        VISTA DE TRANSFERENCIA
        =========================== */
