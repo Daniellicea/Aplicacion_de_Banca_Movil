@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Auth\Passwords\CanResetPassword;
 
 class Usuario extends Authenticatable
 {
-    use Notifiable;
+    use Notifiable, CanResetPassword;
 
     protected $table = 'usuarios';
     protected $primaryKey = 'id';
@@ -25,9 +26,15 @@ class Usuario extends Authenticatable
         return $this->contrasena;
     }
 
-    // ✅ Por si usas recuperación
+    // ✅ Indicar a Laravel que el campo de correo se llama 'correo'
     public function getEmailForPasswordReset()
     {
         return $this->correo;
+    }
+
+    // ✅ Sobrescribir el campo de autenticación principal (username)
+    public function getAuthIdentifierName()
+    {
+        return 'correo';
     }
 }

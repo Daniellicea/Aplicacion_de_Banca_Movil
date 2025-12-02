@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Iniciar Sesión - Bankario')
+@section('title', 'Recuperar Contraseña - Bankario')
 
 @section('content')
     {{-- Contenedor principal con fondo suave --}}
@@ -17,17 +17,27 @@
             <div class="bg-white border border-gray-100 rounded-2xl p-10 shadow-3xl shadow-blue-200/50
                         transform transition duration-500 hover:shadow-blue-300/60 animate-fade-in-down" style="animation-delay: 0.3s;">
 
-                {{-- Mensaje de éxito (Estilo más vivo) --}}
-                @if (session('success'))
+                <h2 class="text-3xl font-extrabold text-gray-900 mb-6 text-center flex items-center justify-center gap-2">
+                    <svg class="w-7 h-7 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+                    Recuperar Contraseña
+                </h2>
+
+                {{-- Instrucción --}}
+                <p class="text-gray-500 text-base mb-8 text-center border-b border-gray-100 pb-4">
+                    Ingresa tu correo y te enviaremos un enlace seguro para restablecer tu contraseña.
+                </p>
+
+                {{-- Mensaje de éxito (después de enviar el correo) --}}
+                @if (session('status'))
                     <div class="mb-6 p-4 bg-green-50 border border-green-400 rounded-xl shadow-md">
                         <p class="text-green-700 text-sm font-semibold flex items-center gap-2">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                            {{ session('success') }}
+                            {{ session('status') }}
                         </p>
                     </div>
                 @endif
 
-                {{-- Mensaje de error (Estilo más vivo) --}}
+                {{-- Mensaje de error --}}
                 @if ($errors->any())
                     <div class="mb-6 p-4 bg-red-50 border border-red-400 rounded-xl shadow-md">
                         <p class="text-red-700 text-sm font-semibold flex items-center gap-2">
@@ -37,41 +47,25 @@
                     </div>
                 @endif
 
-                {{-- Formulario de inicio de sesión --}}
-                <form method="POST" action="{{ route('login') }}" class="space-y-6">
+                {{-- Formulario de recuperación --}}
+                <form method="POST" action="{{ route('password.email') }}" class="space-y-6">
                     @csrf
 
                     {{-- Campo correo --}}
                     <div>
-                        <label for="email" class="block text-xs font-bold text-gray-700 uppercase tracking-widest mb-2">
+                        <label for="correo" class="block text-xs font-bold text-gray-700 uppercase tracking-widest mb-2">
                             Correo Electrónico
                         </label>
                         <input
-                            id="email"
-                            name="email"
+                            id="correo"
+                            name="correo"
                             type="email"
                             placeholder="tu@email.com"
-                            value="{{ old('email') }}"
+                            value="{{ old('correo') }}"
                             class="w-full h-12 px-4 text-base bg-gray-50 border border-gray-300 text-gray-900 rounded-xl
                                    outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-200 transition duration-300 shadow-inner"
                             required
                             autofocus
-                        />
-                    </div>
-
-                    {{-- Campo contraseña --}}
-                    <div>
-                        <label for="password" class="block text-xs font-bold text-gray-700 uppercase tracking-widest mb-2">
-                            Contraseña
-                        </label>
-                        <input
-                            id="password"
-                            name="password"
-                            type="password"
-                            placeholder="••••••••"
-                            class="w-full h-12 px-4 text-base bg-gray-50 border border-gray-300 text-gray-900 rounded-xl
-                                   outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-200 transition duration-300 shadow-inner"
-                            required
                         />
                     </div>
 
@@ -83,24 +77,18 @@
                                shadow-xl shadow-blue-500/40 mt-8
                                transform hover:scale-[1.02] focus:outline-none focus:ring-4 focus:ring-blue-300"
                     >
-                        Iniciar Sesión
+                        Enviar Enlace de Recuperación
                     </button>
                 </form>
 
-                {{-- Link de recuperar contraseña --}}
-                <div class="mt-6 text-center">
-                    <a href="{{ route('password.request') }}" class="text-sm font-medium text-gray-500 hover:text-blue-600 transition-colors">
-                        ¿Olvidaste tu contraseña?
-                    </a>
-                </div>
             </div>
 
-            {{-- Enlace a registro --}}
+            {{-- Enlace a login --}}
             <div class="mt-8 text-center animate-fade-in-down" style="animation-delay: 0.5s;">
                 <p class="text-sm text-gray-500">
-                    ¿No tienes cuenta?
-                    <a href="{{ route('register.form') }}" class="text-blue-600 font-extrabold hover:underline transition-colors">
-                        Regístrate aquí
+                    ¿Ya recordaste tu contraseña?
+                    <a href="{{ route('login') }}" class="text-blue-600 font-extrabold hover:underline transition-colors">
+                        Iniciar Sesión
                     </a>
                 </p>
             </div>

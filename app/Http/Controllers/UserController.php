@@ -85,58 +85,36 @@ public function account()
     $id = session('usuario_id');
     $usuario = Usuario::findOrFail($id);
 
-    // ==========================
-    // Datos simulados de cuentas
-    // ==========================
-    $accounts = [
-        [
-            'type' => 'Cuenta de Ahorro',
-            'name' => 'Ahorros personales',
-            'number' => '1234 5678 9012',
-            'balance' => 15250.75,
-        ],
-        [
-            'type' => 'Cuenta Corriente',
-            'name' => 'Gastos diarios',
-            'number' => '9876 5432 1098',
-            'balance' => 272.50,
-        ],
-    ];
+    // ===============================
+    // Cargar cuentas reales en sesión
+    // ===============================
+    if (!session()->has('cuentas')) {
+        session([
+            'cuentas' => [
+                [
+                    'id' => 'principal',
+                    'type' => 'Cuenta Corriente',
+                    'name' => 'Saldo principal',
+                    'number' => '9876 5432 1098',
+                    'balance' => 5000.00,
+                ],
+                [
+                    'id' => 'ahorros',
+                    'type' => 'Cuenta de Ahorro',
+                    'name' => 'Ahorros personales',
+                    'number' => '1234 5678 9012',
+                    'balance' => 15250.75,
+                ]
+            ],
+            'transactions' => session('transactions') ?? []
+        ]);
+    }
 
-    // ==========================
-    // Movimientos simulados
-    // ==========================
-    $transactions = [
-        [
-            'description' => 'Depósito Nómina',
-            'date' => '2025-10-28',
-            'amount' => 8500.00,
-            'type' => 'credit',
-        ],
-        [
-            'description' => 'Pago de Luz CFE',
-            'date' => '2025-10-26',
-            'amount' => -480.50,
-            'type' => 'debit',
-        ],
-        [
-            'description' => 'Compra en OXXO',
-            'date' => '2025-10-24',
-            'amount' => -65.00,
-            'type' => 'debit',
-        ],
-    ];
+    // Obtener datos reales
+    $accounts = session('cuentas');
+    $transactions = session('transactions');
 
-    $total_gastos = -545.50;
-
-    // ==========================
-    // Retornar vista con datos
-    // ==========================
-    return view('users.accounts', [
-        'usuario' => $usuario,
-        'accounts' => $accounts,
-        'transactions' => $transactions,
-    ]);
+    return view('users.accounts', compact('usuario', 'accounts', 'transactions'));
 }
 
     // ==========================

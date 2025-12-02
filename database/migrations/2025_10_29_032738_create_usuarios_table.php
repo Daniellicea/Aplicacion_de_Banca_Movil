@@ -11,11 +11,11 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::create('usuarios', function (Blueprint $table) {
-            $table->id(); // ID autoincremental
-            $table->string('nombre'); // Nombre completo
-            $table->string('correo')->unique(); // Correo único
-            $table->string('contrasena'); // Contraseña encriptada (sin ñ)
-            $table->timestamps(); // created_at y updated_at
+            $table->id();
+            $table->string('nombre');
+            $table->string('correo')->unique();
+            $table->string('contrasena');
+            $table->timestamps();
         });
     }
 
